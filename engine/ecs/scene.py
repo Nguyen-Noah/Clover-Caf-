@@ -1,5 +1,8 @@
-class Scene:
+from ..utils.elements import Element
+
+class Scene(Element):
     def __init__(self):
+        super().__init__()
         self.camera = None
         self.running = False
         self.entities = []

@@ -66,7 +66,6 @@ class ShaderProgram(Element):
         Returns:
             moderngl.VertexArray - The created VAO
         """
-        print(vbo_info)
         self.vao = self.e['Renderer'].ctx.vertex_array(self.program, vbo_info)
 
     def delete(self):

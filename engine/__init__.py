@@ -6,7 +6,6 @@ from .misc.input import Input
 from .rendering.renderer import Renderer
 from .rendering.shader_program import ShaderRegistry, ShaderProgram
 from .states.game_state import GSManager
-from .tile.tilemap import Tilemap
 
 def init(resolution=(640, 480), 
          caption='game', 
@@ -28,4 +27,3 @@ def init(resolution=(640, 480),
     state_manager = GSManager()
     input = Input(path=input_path)
     assets = Assets(spritesheet_path=spritesheet_path)
-    tilemap = Tilemap(tilesize=tilesize, dimensions=dimensions)

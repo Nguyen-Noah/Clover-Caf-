@@ -1,12 +1,13 @@
+import os, debugpy
 import engine as engine
-from engine.misc.camera import Camera
 from scripts.constants.window import Screen
+from scripts.scenes.test import TestScene
+
+# TODO: make all paths absolute when they are loaded
 
 class Game(engine.Game):
     def load(self):
         scale_ratio = Screen.SCALE_RATIO
-
-        self.camera = Camera(Screen.RESOLUTION)
 
         engine.init(
             resolution=Screen.RESOLUTION,
@@ -17,18 +18,19 @@ class Game(engine.Game):
             spritesheet_path='data/assets/spritesheets'
             )
         
-        
-        
         self.e['Assets'].load_folder('data/assets/floor', scale=3, colorkey=(0, 0, 0))
+        
+        
+        self.current_scene = TestScene()
 
     def update(self):
         self.e['Window'].update()
         self.e['Input'].update()
-         #self.e['GSManager'].update()
+        #self.e['GSManager'].update()
 
-        self.camera.update()
-
-        self.e['Tilemap'].render()
+        self.current_scene.update(self.e['Window'].dt)
+        self.current_scene.render()
+        
         self.e['Renderer'].render()
 
 if __name__ == '__main__':

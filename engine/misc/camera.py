@@ -1,4 +1,4 @@
-import pygame, math, glm, random
+import pygame, math, glm
 from ..utils.elements import ElementSingleton
 from ..utils.game_math import clamp_between
 from ..primitives.vec2 import vec2
@@ -17,13 +17,14 @@ class Camera(ElementSingleton):
         self.screen_shake = 0
         self.shake_amount = 'medium'
         self.zoom = 1
+        self.scroll_sensitivity = 0.01
 
         self.projection_matrix = glm.mat4()
         self.view_matrix = glm.mat4()
-        self.adjust_projection(size)
+        self.adjust_projection()
 
-    def adjust_projection(self, resolution):
-        self.projection_matrix = glm.ortho(0.0, resolution[0], 0.0, resolution[1], 0.0, 100.0)
+    def adjust_projection(self):
+        self.projection_matrix = glm.ortho(0.0, self.size[0] * self.zoom, 0.0, self.size[1] * self.zoom, 0.0, 100.0)
 
 
     def get_view_matrix(self):
@@ -59,6 +60,9 @@ class Camera(ElementSingleton):
         self.screen_shake = duration
         self.shake_amount = amt
 
+    def get_scroll_y(self):
+        return self.zoom
+
     @property
     def target(self):
         if self.track_entity:
@@ -72,6 +76,12 @@ class Camera(ElementSingleton):
             return vec2(target_pos.x - self.e['Window'].display.get_width() // 2, target_pos.y - self.e['Window'].get_height() // 2)
         
     def update(self):
+        if self.e['Input'].mouse.get_scroll_y() != 0:
+            add_value = abs(self.e['Input'].mouse.get_scroll_y() * self.scroll_sensitivity) ** (1 / self.zoom)
+            add_value *= -math.copysign(1.0, self.e['Input'].mouse.get_scroll_y())
+            self.zoom += add_value
+            self.adjust_projection()
+
         self.int_pos = vec2(int(self.camera_offset.x), int(self.camera_offset.y))
         
         if self.e['Input'].holding('right'):

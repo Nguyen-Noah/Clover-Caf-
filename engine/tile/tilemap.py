@@ -1,6 +1,6 @@
 import pygame
 import numpy as np
-from ..utils.elements import ElementSingleton
+from ..utils.elements import Element
 from ..utils.io import read_tjson
 from ..data_structures.quads import Quads
 from .tile import Tile
@@ -11,12 +11,15 @@ from array import array
 
 SHADER_PATH = 'engine/rendering/shaders'
 
-class Tilemap(ElementSingleton):
-    def __init__(self, tilesize=(16, 16), dimensions=(16, 16), scale_ratio=3):
+class Tilemap(Element):
+    def __init__(self, scene, map_id, tilesize=(16, 16), dimensions=(16, 16), scale_ratio=3, resolution=(1080, 720)):
         super().__init__()
+        self.scene = scene
+        self.map = map_id
         self.tilesize = tilesize
         self.dimensions = dimensions
         self.scale_ratio = scale_ratio
+        self.resolution = resolution
         self.grid_tiles = {}
         self.dimensions = tuple(dimensions)
         self.dimensional_lock = True
@@ -24,7 +27,7 @@ class Tilemap(ElementSingleton):
         self.rerender = True
         self.tile_renderer = TileRenderer(f'{SHADER_PATH}/vsDefault.glsl', f'{SHADER_PATH}/default.glsl')
 
-        self.load_map('test')
+        self.load_map(map_id)
         self.set_shader()
 
     def load_map(self, map_name):
@@ -89,7 +92,7 @@ class Tilemap(ElementSingleton):
     
     def set_shader(self):
         self.rerender = False
-        cam_r = self.e['Game'].camera.rect
+        cam_r = self.scene.camera.rect
         tl = (cam_r.left // self.tilesize[0], cam_r.top // self.tilesize[1] - 1)
         br = (cam_r.right // self.tilesize[0], cam_r.bottom // self.tilesize[1])
 
@@ -98,17 +101,23 @@ class Tilemap(ElementSingleton):
             for x in range(tl[0], br[0] + 1):
                 loc = (x, y)
                 if loc in self.floor:
-                    self.instance_data.append((x * self.tilesize[0] * self.scale_ratio, -y * self.tilesize[1] * self.scale_ratio))
+                    self.instance_data.append((
+                        x * self.tilesize[0] * self.scale_ratio, 
+                        -y * self.tilesize[1] * self.scale_ratio))
 
         instance_buffer = self.e['Renderer'].ctx.buffer(np.array(self.instance_data, dtype='f4').tobytes())
 
         render_size = vec2(self.tilesize[0] * self.scale_ratio, self.tilesize[1] * self.scale_ratio)
+        print(self.scene.atlas_coords)
         vertex_array = self.e['Renderer'].ctx.buffer(data=array('f', [
-                        0,   720,                       0.0, 1.0,    #tl
-                        0,   720 - render_size.y,       1.0, 1.0,    #bl
-            render_size.x,   720,                       0.0, 0.0,    #tr
-            render_size.x,   720 - render_size.y,       1.0, 0.0,    #br
+                        0,   self.resolution[1],                       0.0, 1.0,    #tl
+                        0,   self.resolution[1] - render_size.y,       0.0, 1.0 - 0.1875,    #bl
+            render_size.x,   self.resolution[1],                       0.1875, 1.0,    #tr
+            render_size.x,   self.resolution[1] - render_size.y,       0.1875, 1.0 - 0.1875,    #br
         ]))
+
+
+
 
         self.tile_renderer.create_vao([
             (vertex_array, '2f 2f', 'aPos', 'aTexCoords'),
@@ -122,5 +131,5 @@ class Tilemap(ElementSingleton):
         self.e['Renderer'].blit(self.tile_renderer, uniforms={
             'uProjection': self.e['Camera'].get_projection_matrix(),
             'uView': self.e['Camera'].get_view_matrix(),
-            'TEX_SAMPLER': self.e['Assets'].images['floor']['floor_tile']
+            'TEX_ATLAS': self.scene.atlas
         }, instances=self.instance_data)

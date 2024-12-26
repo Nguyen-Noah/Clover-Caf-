@@ -29,6 +29,13 @@ class Mouse(ElementSingleton):
         self.pos = vec2(0, 0)
         self.ui_pos = vec2(0, 0)
         self.movement = vec2(0 ,0)
+        self.scroll_y = 0
+
+    def reset(self):
+        self.scroll_y = 0
+
+    def get_scroll_y(self):
+        return self.scroll_y
 
     def update(self):
         mpos = pygame.mouse.get_pos()
@@ -119,6 +126,10 @@ class Input(ElementSingleton):
                         if self.config[mapping][0] == 'mouse':
                             if event.button == self.config[mapping][1]:
                                 self.input[mapping].press()
+                            if event.button == 4:
+                                self.mouse.scroll_y += 1
+                            if event.button == 5:
+                                self.mouse.scroll_y -= 1
             if event.type == pygame.MOUSEBUTTONUP:
                 for mapping in self.config:
                     if self.config[mapping][0] == 'mouse':
