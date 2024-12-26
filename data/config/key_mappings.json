@@ -1,0 +1,14 @@
+{
+    "pause": ["button", 27],
+    "up": ["button", 119], 
+    "down": ["button", 115], 
+    "right": ["button", 100], 
+    "left": ["button", 97], 
+    "dodge": ["button", 1073742049], 
+    "shoot": ["mouse", 1], 
+    "secondary": ["mouse", 3], 
+    "restart": ["button", 114], 
+    "interact": ["button", 101], 
+    "swap_weapon": ["button", 113], 
+    "hide_ui": ["button", 1073741882]
+}
