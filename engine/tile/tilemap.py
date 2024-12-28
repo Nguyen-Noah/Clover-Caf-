@@ -101,27 +101,40 @@ class Tilemap(Element):
             for x in range(tl[0], br[0] + 1):
                 loc = (x, y)
                 if loc in self.floor:
+                    tile = self.floor[loc]
+                    atlas_data = self.scene.atlas_coords[f'{tile.group}/{tile.type}']
                     self.instance_data.append((
-                        x * self.tilesize[0] * self.scale_ratio, 
-                        -y * self.tilesize[1] * self.scale_ratio))
+                        x * self.tilesize[0] * self.scale_ratio,        # aOffset.x
+                        -y * self.tilesize[1] * self.scale_ratio,       # aOffset.y
+                        atlas_data['tex_x'],
+                        atlas_data['tex_y'],
+                        atlas_data['tex_w'],
+                        atlas_data['tex_h']
+                        ))
 
         instance_buffer = self.e['Renderer'].ctx.buffer(np.array(self.instance_data, dtype='f4').tobytes())
 
         render_size = vec2(self.tilesize[0] * self.scale_ratio, self.tilesize[1] * self.scale_ratio)
-        print(self.scene.atlas_coords)
         vertex_array = self.e['Renderer'].ctx.buffer(data=array('f', [
+                        0,   self.resolution[1],                       0.0, 1.0, # tl
+                        0,   self.resolution[1] - render_size.y,       1.0, 1.0, # bl
+            render_size.x,   self.resolution[1],                       0.0, 0.0, # tr
+            render_size.x,   self.resolution[1] - render_size.y,       1.0, 0.0, # br
+        ]))
+
+        """ vertex_array = self.e['Renderer'].ctx.buffer(data=array('f', [
                         0,   self.resolution[1],                       0.0, 1.0,    #tl
                         0,   self.resolution[1] - render_size.y,       0.0, 1.0 - 0.1875,    #bl
             render_size.x,   self.resolution[1],                       0.1875, 1.0,    #tr
             render_size.x,   self.resolution[1] - render_size.y,       0.1875, 1.0 - 0.1875,    #br
-        ]))
+        ])) """
 
 
 
 
         self.tile_renderer.create_vao([
             (vertex_array, '2f 2f', 'aPos', 'aTexCoords'),
-            (instance_buffer, '2f/i', 'aOffset')
+            (instance_buffer, '2f 4f', 'aOffset', 'aAtlasRegion')
         ])
 
     def render(self):

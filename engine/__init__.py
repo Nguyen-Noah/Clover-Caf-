@@ -3,8 +3,7 @@ from .misc.camera import Camera
 from .misc.game import Game
 from .misc.window import Window
 from .misc.input import Input
-from .rendering.renderer import Renderer
-from .rendering.shader_program import ShaderRegistry, ShaderProgram
+from .rendering.shader import ShaderRegistry, Shader
 from .states.game_state import GSManager
 
 def init(resolution=(640, 480), 
@@ -23,7 +22,6 @@ def init(resolution=(640, 480),
          dimensions=(16, 16)):
     window = Window(resolution=resolution, caption=caption, flags=flags, fps_cap=fps_cap, dt_cap=dt_cap, opengl=opengl, shader_path=shader_path)
     shader_registry = ShaderRegistry()
-    renderer = Renderer()
     state_manager = GSManager()
     input = Input(path=input_path)
     assets = Assets(spritesheet_path=spritesheet_path)

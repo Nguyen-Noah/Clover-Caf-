@@ -2,7 +2,7 @@ import pygame, moderngl
 import numpy as np
 from .io import recursive_file_op
 
-def load_img(path, ctx=None, alpha=False, scale=1, colorkey=None):
+def load_img(path, ctx=None, alpha=False, scale=1, colorkey=(255, 255, 255)):
     if path.split('/')[-1].split('.')[-1] in ['json']:
         return
 
@@ -25,7 +25,7 @@ def pg2tex(surf, ctx):
     w, h = surf.get_size()
     tex_data = pygame.image.tobytes(surf, 'RGBA', 1)
     tex = ctx.texture((w, h), 4, tex_data)
-    tex.filter = (moderngl.LINEAR, moderngl.LINEAR)
+    tex.filter = (moderngl.NEAREST, moderngl.NEAREST)
     return tex
 
 def load_img_dir(path, ctx=None, alpha=None, scale=1, colorkey=None):

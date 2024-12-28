@@ -1,9 +1,12 @@
-import os, debugpy
+import moderngl
 import engine as engine
 from scripts.constants.window import Screen
 from scripts.scenes.test import TestScene
 
-# TODO: make all paths absolute when they are loaded
+# TODO: - make all paths absolute when they are loaded
+#       - current level editor's origin is top left, 
+#         eventually make a new level editor with origin at bottom right
+#           - this is why all the rendering is upside down/zoom is weird
 
 class Game(engine.Game):
     def load(self):
@@ -17,11 +20,12 @@ class Game(engine.Game):
             shader_path='scripts/rendering/shaders',
             spritesheet_path='data/assets/spritesheets'
             )
-        
-        self.e['Assets'].load_folder('data/assets/floor', scale=3, colorkey=(0, 0, 0))
+        self.ctx = moderngl.create_context(require=330)
+        self.e['Assets'].load_folder('data/assets/floor', colorkey=(0, 0, 0))
         
         
         self.current_scene = TestScene()
+        self.current_scene.start()
 
     def update(self):
         self.e['Window'].update()
@@ -30,8 +34,6 @@ class Game(engine.Game):
 
         self.current_scene.update(self.e['Window'].dt)
         self.current_scene.render()
-        
-        self.e['Renderer'].render()
 
 if __name__ == '__main__':
     Game().run()
