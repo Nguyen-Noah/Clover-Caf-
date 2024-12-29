@@ -20,7 +20,7 @@ class Renderer(ElementSingleton):
     def _add(self, sprite):
         added = False
         for batch in self.batches:
-            if batch.has_room:
+            if batch.has_room and batch.z_index == sprite.entity.z_index:
                 tex = sprite.get_texture()
                 if tex is None or batch.has_texture(tex) or batch.has_texture_room():
                     batch.add_sprite(sprite)
@@ -28,14 +28,11 @@ class Renderer(ElementSingleton):
                     break
 
         if not added:
-            new_batch = RenderBatch(max_batch_size=self.max_batch_size)
+            new_batch = RenderBatch(z_index=sprite.entity.z_index, max_batch_size=self.max_batch_size)
             self.batches.append(new_batch)
             new_batch.add_sprite(sprite)
+            self.batches.sort(key=lambda batch: batch.z_index)
 
     def render(self):
-        self.e['Game'].ctx.clear(0.1, 0.1, 0.1, 1.0)
-
         for batch in self.batches:
             batch.render()
-
-        pygame.display.flip()

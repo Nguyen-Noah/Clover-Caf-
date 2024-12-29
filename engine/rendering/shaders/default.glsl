@@ -14,8 +14,4 @@ void main() {
     } else {
         color = fColor - vec4(fTexId);
     }
-
-    if (color.a < 0.1) {
-        discard;
-    }
 }

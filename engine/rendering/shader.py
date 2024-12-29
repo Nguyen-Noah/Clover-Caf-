@@ -31,6 +31,8 @@ class Shader(Element):
 
         self.uniform_cache = {}
 
+        self.textures = []
+
     def create_vbo(self, data, dtype='f4'):
         """
         Creates a Vertex Buffer Object (VBO)
@@ -101,6 +103,8 @@ class Shader(Element):
             self.vao.render(mode=moderngl.TRIANGLES, instances=len(instances))
         else:
             self.vao.render(mode=moderngl.TRIANGLES)
+        
+        self.detatch_textures()
 
     def _update_uniform(self, uniform, value, tex_id):
         if isinstance(value, moderngl.Texture) or isinstance(value, moderngl.TextureArray):
@@ -109,7 +113,14 @@ class Shader(Element):
             # Specify texture ID as uniform target
             self.program[uniform].value = tex_id
             tex_id += 1
+            self.textures.append(value)
         elif isinstance(value, glm.mat4):
             self.program[uniform].write(value.to_bytes())
         else:
             self.program[uniform].value = value
+
+    def detatch_textures(self):
+        for tex in self.textures:
+            tex.release()
+
+        self.textures = []

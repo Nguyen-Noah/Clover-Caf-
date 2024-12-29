@@ -2,11 +2,12 @@ from ..utils.elements import Element
 from ..components.transform import Transform
 
 class Entity(Element):
-    def __init__(self, name, transform=Transform()):
+    def __init__(self, name, z_index=0, transform=Transform()):
         super().__init__()
         self.name = name
         self.components = []
         self.transform = transform
+        self.z_index = z_index
 
     def get_component(self, component_class):
         for component in self.components:

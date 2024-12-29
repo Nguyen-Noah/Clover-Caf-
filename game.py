@@ -1,4 +1,4 @@
-import moderngl
+import moderngl, pygame
 import engine as engine
 from scripts.constants.window import Screen
 from scripts.scenes.test import TestScene
@@ -22,18 +22,26 @@ class Game(engine.Game):
             )
         self.ctx = moderngl.create_context(require=330)
         self.e['Assets'].load_folder('data/assets/floor', colorkey=(0, 0, 0))
-        
-        
+
         self.current_scene = TestScene()
         self.current_scene.start()
 
     def update(self):
         self.e['Window'].update()
+        self.e['ImGui'].start_frame()
         self.e['Input'].update()
         #self.e['GSManager'].update()
 
+        self.e['Game'].ctx.clear(0.1, 0.1, 0.1, 1.0)
+        self.e['Game'].ctx.enable(moderngl.BLEND)
+
         self.current_scene.update(self.e['Window'].dt)
         self.current_scene.render()
+
+        self.e['ImGui'].update()
+
+        self.e['Game'].ctx.disable(moderngl.BLEND)
+        pygame.display.flip()
 
 if __name__ == '__main__':
     Game().run()

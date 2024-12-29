@@ -110,6 +110,9 @@ class Input(ElementSingleton):
         self.e['Mouse'].update()
 
         for event in pygame.event.get():
+
+            self.e['ImGui'].process_event(event)
+
             if (event.type == pygame.QUIT) or (event.type == pygame.KEYDOWN and event.key == 27):
                 pygame.quit()
                 sys.exit()

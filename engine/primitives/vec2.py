@@ -1,4 +1,5 @@
 import math
+from copy import deepcopy
 
 class vec2:
     def __init__(self, x=0, y=0):
@@ -36,7 +37,7 @@ class vec2:
 
     def __eq__(self, other):
         return math.isclose(self.x, other.x) and math.isclose(self.y, other.y)
-    
+
     def __getitem__(self, index):
         if index == 0:
             return self.x

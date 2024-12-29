@@ -4,8 +4,13 @@ from ..rendering.shader import Shader
 from ..utils.elements import Element
 from ..components.sprite_renderer import SpriteRenderer
 
+# there is an issue where each batch starts up a new instance
+# of the same shader. this is because when they shared a shader
+# there was an issue where only the last batch was rendered
+# later down the road, this should be fixed
+
 class RenderBatch(Element):
-    def __init__(self, max_batch_size=1000):
+    def __init__(self, z_index=0, max_batch_size=1000):
         super().__init__()
         """
         Vertex
@@ -27,12 +32,16 @@ class RenderBatch(Element):
         self.vbo = None
 
         self.MAX_BATCH_SIZE = max_batch_size
-        self.shader = self.e['Assets'].get_shader('vsDefault.glsl', 'default.glsl')
+        #self.shader = self.e['Assets'].get_shader('vsDefault.glsl', 'default.glsl')
+        self.shader = Shader('engine/rendering/shaders' + '/vsDefault.glsl', 'engine/rendering/shaders' + '/default.glsl')
 
-        self.vertices = []
+
+        self.vertices = [0.0] * (self.MAX_BATCH_SIZE * 4 * self.VERTEX_SIZE)
 
         self.textures = []
         self.texture_array = None
+
+        self.z_index = z_index
 
     def setup_buffers(self):
         vbo = self.e['Game'].ctx.buffer(np.array(self.vertices, dtype='f4').tobytes())
@@ -78,6 +87,8 @@ class RenderBatch(Element):
         color = sprite.color
         tex_coords = sprite.get_tex_coords()
 
+        offset = index * 4 * self.VERTEX_SIZE
+
         tex_id = 0
         if sprite.get_texture() is not None:
             for i, tex in enumerate(self.textures):
@@ -96,23 +107,25 @@ class RenderBatch(Element):
             elif i == 3:
                 y_add = 1.0
 
-            # load positions
+            # Load positions
             tr = sprite.entity.transform
-            self.vertices.append(tr.position.x + (x_add * tr.scale.x))
-            self.vertices.append(tr.position.y + (y_add * tr.scale.y))
+            self.vertices[offset] = tr.position.x + (x_add * tr.scale.x)
+            self.vertices[offset + 1] = tr.position.y + (y_add * tr.scale.y)
 
-            # load color
-            self.vertices.append(color[0])
-            self.vertices.append(color[1])
-            self.vertices.append(color[2])
-            self.vertices.append(color[3])
+            # Load color
+            self.vertices[offset + 2] = color[0]
+            self.vertices[offset + 3] = color[1]
+            self.vertices[offset + 4] = color[2]
+            self.vertices[offset + 5] = color[3]
 
-            # load texcoords
-            self.vertices.append(tex_coords[i].x)
-            self.vertices.append(tex_coords[i].y)
+            # Load texture coordinates
+            self.vertices[offset + 6] = tex_coords[i].x
+            self.vertices[offset + 7] = tex_coords[i].y
 
-            # load tex id
-            self.vertices.append(tex_id)
+            # Load texture ID
+            self.vertices[offset + 8] = tex_id
+
+            offset += self.VERTEX_SIZE
 
     # MOVE TO ASSETS FILE
     def create_texture_array(self):
@@ -140,7 +153,20 @@ class RenderBatch(Element):
         return tex in self.textures
 
     def render(self):
-        self.setup_buffers()
+        rebuffer_data = False
+        for i in range(self.num_sprites):
+            if self.sprites[i] is None:
+                break
+            spr = self.sprites[i]
+            if spr.is_dirty():
+                self.load_vertex_properties(i)
+                spr.clean()
+                rebuffer_data = True
+
+        if rebuffer_data:
+            self.setup_buffers()
+
+        self.create_texture_array()
         self.shader.render(uniforms={
             'uProjection': self.e['Camera'].get_projection_matrix(),
             'uView': self.e['Camera'].get_view_matrix(),

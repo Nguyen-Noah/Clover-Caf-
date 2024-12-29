@@ -85,16 +85,16 @@ class Camera(ElementSingleton):
         self.int_pos = vec2(int(self.camera_offset.x), int(self.camera_offset.y))
         
         if self.e['Input'].holding('right'):
-            self.camera_offset.x += 0.5
+            self.camera_offset.x += 4
             print(self.camera_offset)
         if self.e['Input'].holding('left'):
-            self.camera_offset.x -= 0.5
+            self.camera_offset.x -= 4
             print(self.camera_offset)
         if self.e['Input'].holding('down'):
-            self.camera_offset.y -= 0.5
+            self.camera_offset.y -= 4
             print(self.camera_offset)
         if self.e['Input'].holding('up'):
-            self.camera_offset.y += 0.5
+            self.camera_offset.y += 4
             print(self.camera_offset)
 
         target = self.target
