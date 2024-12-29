@@ -138,6 +138,7 @@ class RenderBatch(Element):
 
         data_list = []
         for tex in self.textures:
+            tex = tex.texture
             data_list.append(np.frombuffer(tex.read(), dtype=np.uint8))
 
         tex_arr_data = np.concatenate(data_list)

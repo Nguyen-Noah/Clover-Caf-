@@ -19,3 +19,15 @@ class Transform:
         if not isinstance(o, Transform):
             return False
         return self.position == o.position and self.scale == o.scale
+    
+    def serialize(self):
+        return {
+            "position": self.position.serialize(),
+            "scale": self.scale.serialize()
+        }
+    
+    @classmethod
+    def deserialize(cls, data):
+        position = vec2().deserialize(data["position"]) if "position" in data else vec2(0, 0)
+        scale = vec2().deserialize(data["scale"]) if "scale" in data else vec2(0, 0)
+        return cls(position=position, scale=scale)

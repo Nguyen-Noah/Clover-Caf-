@@ -38,7 +38,7 @@ class Game(engine.Game):
         self.current_scene.update(self.e['Window'].dt)
         self.current_scene.render()
 
-        self.e['ImGui'].update()
+        self.e['ImGui'].update(self.e['Window'].dt, self.current_scene)
 
         self.e['Game'].ctx.disable(moderngl.BLEND)
         pygame.display.flip()

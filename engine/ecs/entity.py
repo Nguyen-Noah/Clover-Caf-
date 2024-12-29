@@ -1,5 +1,7 @@
 from ..utils.elements import Element
 from ..components.transform import Transform
+from ..primitives.vec2 import vec2
+from ..components.component_deserializer import deserialize_component
 
 class Entity(Element):
     def __init__(self, name, z_index=0, transform=Transform()):
@@ -32,3 +34,33 @@ class Entity(Element):
     def start(self):
         for component in self.components:
             component.start()
+
+    def imgui(self):
+        for component in self.components:
+            component.imgui()
+
+    def serialize(self):
+        return {
+            "name": self.name,
+            "z_index": self.z_index,
+            "transform": self.transform.serialize() if self.transform else None,
+            "components": [component.serialize() for component in self.components]
+        }
+    
+    @classmethod
+    def deserialize(cls, data):
+        transform = Transform.deserialize(data["transform"]) if data.get("transform") else Transform()
+        entity = cls(data["name"], z_index=data["z_index"], transform=transform)
+
+        for component_data in data["components"]:
+            component_type = deserialize_component(component_data)
+            entity.add_component(component_type)
+
+            """ if component_type and component_type in ComponentRegistry:
+                # Fetch the corresponding component class from the registry
+                component_class = ComponentRegistry[component_type]
+                # Deserialize the component and add it to the entity
+                component = component_class.deserialize(component_data)
+                entity.add_component(component) """
+
+        return entity

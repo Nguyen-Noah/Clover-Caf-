@@ -1,5 +1,8 @@
+import imgui
+from .entity import Entity
 from ..utils.elements import Element
 from ..rendering.renderer import Renderer
+from ..utils.io import write_json, read_json
 
 class Scene(Element):
     def __init__(self):
@@ -8,6 +11,8 @@ class Scene(Element):
         self.running = False
         self.entities = []
         self.renderer = Renderer()
+        self.active_entity = None
+        self.loaded = False
 
     def init(self):
         pass
@@ -24,5 +29,30 @@ class Scene(Element):
             entity.start()
             self.renderer.add(entity)
 
+    def scene_imgui(self):
+        if self.active_entity is not None:
+            imgui.begin('Inspector')
+            self.active_entity.imgui()
+            imgui.end()
+
+        self.imgui()
+
+    def imgui(self):
+        pass
+
     def update(self, dt):
         pass
+
+
+    # might want to add some safety checks here
+    def load(self, path):
+        data = read_json(path)
+        for entity in data:
+            entry = Entity.deserialize(entity)
+            self.add_entity_to_scene(entry)
+
+    def save_exit(self):
+        data = []
+        for entity in self.entities:
+            data.append(entity.serialize())
+        write_json('level.json', data)

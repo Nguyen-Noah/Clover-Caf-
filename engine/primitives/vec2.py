@@ -106,3 +106,15 @@ class vec2:
 
     def copy(self):
         return vec2(self.x, self.y)
+    
+    def serialize(self):
+        return {
+            "x": self.x,
+            "y": self.y
+        }
+    
+    @classmethod
+    def deserialize(cls, data):
+        x = data.get('x', 0)
+        y = data.get('y', 0)
+        return cls(x, y)

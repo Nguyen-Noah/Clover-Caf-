@@ -9,7 +9,9 @@ class ImGui(ElementSingleton):
         super().__init__()
         imgui.create_context()
         self.renderer = PygameRenderer()
-        imgui.get_io().display_size = resolution
+        self.io = imgui.get_io()
+        self.io.display_size = resolution
+        self.io.ini_file_name = 'imgui.ini'
 
         self.load_font('LEMONMILK.otf', 20)
 
@@ -17,26 +19,20 @@ class ImGui(ElementSingleton):
         self.renderer.process_event(event)
 
     def start_frame(self):
-        imgui.new_frame()
+        try:
+            imgui.new_frame()
+        except imgui.core.ImGuiError as e:
+            pass
 
     def load_font(self, font_path, font_size):
         io = imgui.get_io()
         io.fonts.add_font_from_file_ttf(f'{FONT_PATH}/{font_path}', font_size)
         self.renderer.refresh_font_texture()
 
-    def update(self):
-        if imgui.begin_main_menu_bar():
-            if imgui.begin_menu("File", True):
+    def update(self, dt, scene):
+        self.start_frame()
+        scene.scene_imgui()
 
-                clicked_quit, selected_quit = imgui.menu_item(
-                    "Quit", "Cmd+Q", False, True
-                )
-
-                if clicked_quit:
-                    sys.exit(0)
-
-                imgui.end_menu()
-            imgui.end_main_menu_bar()
         imgui.show_test_window()
 
         imgui.render()

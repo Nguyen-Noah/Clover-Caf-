@@ -1,5 +1,7 @@
+import imgui
 from ..ecs.component import Component
 from ..components.transform import Transform
+from ..components.sprite import Sprite
 from ..primitives.vec2 import vec2
 
 class SpriteRenderer(Component):
@@ -26,6 +28,12 @@ class SpriteRenderer(Component):
     def clean(self):
         self.dirty = False
     
+    def imgui(self):
+        c = imgui.color_edit4('Color Picker', *self.color, imgui.COLOR_EDIT_NO_INPUTS)
+        if c[0]:
+            self.set_color(c[1])
+            self.dirty = True
+
     @property
     def sprite(self):
         return self._sprite
@@ -39,7 +47,7 @@ class SpriteRenderer(Component):
         return self._color
 
     def set_color(self, new_color):
-        if not self.color.equals(new_color):
+        if self.color != new_color:
             self._color = new_color
             self.dirty = True
 
@@ -48,3 +56,15 @@ class SpriteRenderer(Component):
         if not self.last_transform.equals(self.entity.transform):
             self.entity.transform.copy(self.last_transform)
             self.dirty = True
+
+    def serialize(self):
+        data = super().serialize()
+        data.update({
+            "color": self.color,
+            "sprite": self.sprite.serialize()
+        })
+        return data
+    
+    @classmethod
+    def deserialize(cls, data):
+        return cls(color=data['color'], sprite=Sprite.deserialize(data['sprite']))
