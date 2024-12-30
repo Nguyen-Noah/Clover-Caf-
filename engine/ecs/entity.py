@@ -4,12 +4,16 @@ from ..primitives.vec2 import vec2
 from ..components.component_deserializer import deserialize_component
 
 class Entity(Element):
+    ID_COUNTER = 0
+
     def __init__(self, name, z_index=0, transform=Transform()):
         super().__init__()
         self.name = name
         self.components = []
         self.transform = transform
         self.z_index = z_index
+        self.uid = Entity.ID_COUNTER
+        Entity.ID_COUNTER += 1
 
     def get_component(self, component_class):
         for component in self.components:
@@ -24,6 +28,7 @@ class Entity(Element):
                 break
 
     def add_component(self, c):
+        c.generate_id()
         self.components.append(c)
         c.entity = self
 
@@ -39,8 +44,12 @@ class Entity(Element):
         for component in self.components:
             component.imgui()
 
+    def init(max_id):
+        Entity.ID_COUNTER = max_id
+
     def serialize(self):
         return {
+            "uid": self.uid,
             "name": self.name,
             "z_index": self.z_index,
             "transform": self.transform.serialize() if self.transform else None,

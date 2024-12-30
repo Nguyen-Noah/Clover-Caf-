@@ -3,6 +3,8 @@ import engine as engine
 from scripts.constants.window import Screen
 from scripts.scenes.test import TestScene
 
+from engine.rendering.debug_draw import DebugDraw
+
 # TODO: - make all paths absolute when they are loaded
 #       - current level editor's origin is top left, 
 #         eventually make a new level editor with origin at bottom right
@@ -18,8 +20,10 @@ class Game(engine.Game):
             shader_path='scripts/rendering/shaders',
             spritesheet_path='data/assets/spritesheets'
             )
-        self.ctx = moderngl.create_context(require=330)
+        self.ctx = moderngl.create_context(debug=True, require=330)
         self.e['Assets'].load_folder('data/assets/floor', colorkey=(0, 0, 0))
+        
+        self.debug_draw = DebugDraw()
 
         self.current_scene = TestScene()
         self.current_scene.start()
@@ -30,9 +34,12 @@ class Game(engine.Game):
         self.e['Input'].update()
         #self.e['GSManager'].update()
 
-        self.e['Game'].ctx.clear(0.1, 0.1, 0.1, 1.0)
+        self.debug_draw.begin_frame()
+
+        self.e['Game'].ctx.clear(0.90, 0.90, 0.90, 1.0)
         self.e['Game'].ctx.enable(moderngl.BLEND)
 
+        self.debug_draw.draw()
         self.current_scene.update(self.e['Window'].dt)
         self.current_scene.render()
 

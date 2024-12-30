@@ -6,12 +6,15 @@ class Texture(Element):
         super().__init__()
         self.path = path
         self.load_texture(self.path)
-        
+
     def load_texture(self, path):
         self.texture = load_texture(path, self.e['Game'].ctx)
         self.width = self.texture.width
         self.height = self.texture.height
         self.size = self.texture.size
+
+    def get_id(self):
+        return self.texture.glo
 
     def serialize(self):
         return {
@@ -24,3 +27,4 @@ class Texture(Element):
     def deserialize(cls, data):
         texture = cls(data['path'])
         return texture
+    

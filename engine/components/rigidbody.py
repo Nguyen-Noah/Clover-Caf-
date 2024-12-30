@@ -1,4 +1,4 @@
-from ..ecs.component import Component
+from .component import Component
 from ..primitives.vec3 import vec3
 from ..primitives.vec4 import vec4
 

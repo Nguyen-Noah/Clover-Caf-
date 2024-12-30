@@ -22,7 +22,7 @@ class Spritesheet:
                 vec2(left_x,    top_y),
             ]
 
-            sprite = Sprite(self.texture, tex_coords=tex_coords)
+            sprite = Sprite(self.texture, sprite_width, sprite_height, tex_coords=tex_coords)
             self.sprites.append(sprite)
 
             current_x += sprite_width + padding
@@ -32,3 +32,14 @@ class Spritesheet:
 
     def get_sprite(self, index):
         return self.sprites[index]
+    
+    def size(self):
+        return len(self.sprites)
+    
+    @property
+    def width(self):
+        return self.texture.width
+    
+    @property
+    def height(self):
+        return self.texture.height

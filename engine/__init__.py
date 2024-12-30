@@ -23,6 +23,6 @@ def init(resolution=(640, 480),
     window = Window(resolution=resolution, caption=caption, flags=flags, fps_cap=fps_cap, dt_cap=dt_cap, opengl=opengl, shader_path=shader_path)
     shader_registry = ShaderRegistry()
     state_manager = GSManager()
-    input = Input(path=input_path)
+    input = Input(path=input_path, resolution=resolution)
     assets = Assets(spritesheet_path=spritesheet_path)
     imgui = ImGui(resolution)

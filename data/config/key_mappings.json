@@ -5,7 +5,7 @@
     "right": ["button", 100], 
     "left": ["button", 97], 
     "dodge": ["button", 1073742049], 
-    "shoot": ["mouse", 1], 
+    "left_click": ["mouse", 1], 
     "secondary": ["mouse", 3], 
     "restart": ["button", 114], 
     "interact": ["button", 101], 

@@ -1,4 +1,4 @@
-import pygame, time, sys
+import pygame, time, glm
 from ..utils.elements import ElementSingleton
 from ..primitives.vec2 import vec2
 from ..utils.io import write_json, read_json
@@ -24,8 +24,9 @@ class InputState:
         self.just_released = True
 
 class Mouse(ElementSingleton):
-    def __init__(self):
+    def __init__(self, resolution):
         super().__init__()
+        self.resolution = resolution
         self.pos = vec2(0, 0)
         self.ui_pos = vec2(0, 0)
         self.movement = vec2(0 ,0)
@@ -36,6 +37,24 @@ class Mouse(ElementSingleton):
 
     def get_scroll_y(self):
         return self.scroll_y
+    
+    def get_ortho_x(self):
+        curr_x = self.pos.x
+        curr_x = (curr_x / self.resolution[0]) * 2 - 1
+        tmp = glm.vec4(curr_x, 0, 0, 1)
+        tmp = tmp * self.e['Game'].current_scene.camera.inverse_projection
+        tmp = tmp * self.e['Game'].current_scene.camera.inverse_view
+
+        return tmp.x
+
+    def get_ortho_y(self):
+        curr_y = self.resolution[1] - self.pos.y
+        curr_y = (curr_y / self.resolution[1]) * 2 - 1
+        tmp = glm.vec4(0, curr_y, 0, 1)
+        tmp = tmp * self.e['Game'].current_scene.camera.inverse_projection
+        tmp = tmp * self.e['Game'].current_scene.camera.inverse_view
+
+        return tmp.y
 
     def update(self):
         mpos = pygame.mouse.get_pos()
@@ -44,7 +63,7 @@ class Mouse(ElementSingleton):
         self.ui_pos = vec2(mpos[0] // 2, mpos[1] // 2)
 
 class Input(ElementSingleton):
-    def __init__(self, path):
+    def __init__(self, path, resolution):
         super().__init__()
         self.state = 'main'
         self.text_buffer = None
@@ -72,7 +91,7 @@ class Input(ElementSingleton):
         }
         self.shift = False
 
-        self.mouse = Mouse()
+        self.mouse = Mouse(resolution)
 
         self.binding_listen = None
 

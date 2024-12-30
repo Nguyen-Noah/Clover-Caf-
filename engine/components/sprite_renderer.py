@@ -1,5 +1,5 @@
 import imgui
-from ..ecs.component import Component
+from .component import Component
 from ..components.transform import Transform
 from ..components.sprite import Sprite
 from ..primitives.vec4 import vec4

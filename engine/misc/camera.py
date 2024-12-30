@@ -3,6 +3,7 @@ from ..utils.elements import ElementSingleton
 from ..utils.game_math import clamp_between
 from ..primitives.vec2 import vec2
 
+# CHANGE TO NON SINGLETON (?)
 class Camera(ElementSingleton):
     def __init__(self, size):
         super().__init__()
@@ -21,11 +22,13 @@ class Camera(ElementSingleton):
 
         self.projection_matrix = glm.mat4()
         self.view_matrix = glm.mat4()
+        self.inverse_projection = glm.mat4()
+        self.inverse_view = glm.mat4()
         self.adjust_projection()
 
     def adjust_projection(self):
         self.projection_matrix = glm.ortho(0.0, self.size[0] * self.zoom, 0.0, self.size[1] * self.zoom, 0.0, 100.0)
-
+        self.inverse_projection = glm.inverse(self.projection_matrix)
 
     def get_view_matrix(self):
         camera_front = glm.vec3(0.0, 0.0, -1.0)
@@ -33,6 +36,8 @@ class Camera(ElementSingleton):
         self.view_matrix = glm.lookAt(glm.vec3(self.camera_offset.x, self.camera_offset.y, 20.0),
                                         camera_front + glm.vec3(self.camera_offset.x, self.camera_offset.y, 0.0),
                                         camera_up)
+        self.inverse_view = glm.inverse(self.view_matrix)
+
         return self.view_matrix
     
     def get_projection_matrix(self):
@@ -86,18 +91,18 @@ class Camera(ElementSingleton):
         
         if self.e['Input'].holding('right'):
             self.camera_offset.x += 4
-            print(self.camera_offset)
+            #print(self.camera_offset)
         if self.e['Input'].holding('left'):
             self.camera_offset.x -= 4
-            print(self.camera_offset)
+            #print(self.camera_offset)
         if self.e['Input'].holding('down'):
             self.camera_offset.y -= 4
-            print(self.camera_offset)
+            #print(self.camera_offset)
         if self.e['Input'].holding('up'):
             self.camera_offset.y += 4
-            print(self.camera_offset)
+            #print(self.camera_offset)
 
-        target = self.target
+        """ target = self.target
         if target:
             self.camera_offset[0] += math.floor(target[0] - self.camera_offset[0]) / (self.rate / self.e['Window'].dt)
             self.camera_offset[1] += math.floor(target[1] - self.camera_offset[1]) / (self.rate / self.e['Window'].dt)
@@ -116,4 +121,4 @@ class Camera(ElementSingleton):
             self.zoom += 1
         if self.e['Input'].pressed('zoom_out'):
             self.zoom -= 1
-        self.zoom = clamp_between(self.zoom, 1, 10)
+        self.zoom = clamp_between(self.zoom, 1, 10) """

@@ -33,7 +33,7 @@ class RenderBatch(Element):
 
         self.MAX_BATCH_SIZE = max_batch_size
         #self.shader = self.e['Assets'].get_shader('vsDefault.glsl', 'default.glsl')
-        self.shader = Shader('engine/rendering/shaders' + '/vsDefault.glsl', 'engine/rendering/shaders' + '/default.glsl')
+        self.shader = Shader('engine/rendering/shaders/vsDefault.glsl', 'engine/rendering/shaders/default.glsl')
 
 
         self.vertices = [0.0] * (self.MAX_BATCH_SIZE * 4 * self.VERTEX_SIZE)
