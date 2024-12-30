@@ -23,5 +23,4 @@ class Texture(Element):
     @classmethod
     def deserialize(cls, data):
         texture = cls(data['path'])
-        print(texture)
         return texture

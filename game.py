@@ -10,8 +10,6 @@ from scripts.scenes.test import TestScene
 
 class Game(engine.Game):
     def load(self):
-        scale_ratio = Screen.SCALE_RATIO
-
         engine.init(
             resolution=Screen.RESOLUTION,
             input_path='data/config/key_mappings.json',
@@ -45,3 +43,6 @@ class Game(engine.Game):
 
 if __name__ == '__main__':
     Game().run()
+
+# fruit sushi
+# chocolate/dessert burrito

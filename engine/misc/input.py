@@ -114,8 +114,7 @@ class Input(ElementSingleton):
             self.e['ImGui'].process_event(event)
 
             if (event.type == pygame.QUIT) or (event.type == pygame.KEYDOWN and event.key == 27):
-                pygame.quit()
-                sys.exit()
+                self.e['Game'].quit()
 
             if event.type == pygame.VIDEORESIZE:
                 self.e['Window'].reload_display((event.w, event.h))

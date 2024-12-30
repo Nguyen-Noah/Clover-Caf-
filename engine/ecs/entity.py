@@ -56,11 +56,4 @@ class Entity(Element):
             component_type = deserialize_component(component_data)
             entity.add_component(component_type)
 
-            """ if component_type and component_type in ComponentRegistry:
-                # Fetch the corresponding component class from the registry
-                component_class = ComponentRegistry[component_type]
-                # Deserialize the component and add it to the entity
-                component = component_class.deserialize(component_data)
-                entity.add_component(component) """
-
         return entity

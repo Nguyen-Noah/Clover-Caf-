@@ -8,6 +8,7 @@ from engine.components.transform import Transform
 from engine.components.sprite_renderer import SpriteRenderer
 from engine.components.sprite import Sprite
 from engine.components.spritesheet import Spritesheet
+from engine.components.rigidbody import RigidBody
 from engine.primitives.vec2 import vec2
 
 from engine.utils.io import read_json, write_json
@@ -20,21 +21,6 @@ class TestScene(Scene):
 
         self.sprites = self.e['Assets'].get_spritesheet('veggies.png')
 
-        """ self.entity1 = Entity(name=f'Turnip Seeds', 
-                              transform=Transform(vec2(430, 170), vec2(100, 100)),
-                              z_index=3
-                              )
-        self.entity1.add_component(SpriteRenderer(sprite=self.sprites.get_sprite(0)))
-        self.add_entity_to_scene(self.entity1)
-
-        entity2 = Entity(name=f'Onion', 
-                         transform=Transform(vec2(400, 200), vec2(100, 200)),
-                         z_index=1
-                         )
-        entity2.add_component(SpriteRenderer(sprite=self.sprites.get_sprite(5)))
-        self.add_entity_to_scene(entity2) """
-
-        #self.save_exit()
         self.load('level.json')
 
         self.active_entity = self.entities[0]

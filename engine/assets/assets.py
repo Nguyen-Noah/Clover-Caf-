@@ -36,7 +36,6 @@ class Assets(ElementSingleton):
         name = resource_name.split('.')[0]
         if name in self.textures:
             return self.textures[name]
-        print(name)
         tex = Texture(f'{self.spritesheet_path}/{resource_name}')
         #tex = pg2tex(load_img(f'{self.spritesheet_path}/{resource_name}', alpha=True, colorkey=(255, 255, 255)), self.e['Game'].ctx)
         self.textures[name] = tex

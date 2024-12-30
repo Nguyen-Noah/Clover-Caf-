@@ -15,3 +15,8 @@ class Game(ElementSingleton):
         self.load()
         while True:
             self.update()
+
+    def quit(self):
+        self.current_scene.save_exit()
+        pygame.quit()
+        sys.exit()
