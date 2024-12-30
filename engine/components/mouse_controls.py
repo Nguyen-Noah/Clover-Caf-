@@ -1,5 +1,6 @@
 from .component import Component
 from ..utils.elements import Element
+from ..utils.settings import Settings
 
 # pretty much a helper component
 class MouseControls(Component, Element):
@@ -18,8 +19,11 @@ class MouseControls(Component, Element):
     def update(self, dt):
         # temporary
         if self.holding_entity is not None:
-            self.holding_entity.transform.position.x = self.e['Input'].mouse.get_ortho_x() + 540 - 30
-            self.holding_entity.transform.position.y = self.e['Input'].mouse.get_ortho_y() + 360 - 25
+            position = self.holding_entity.transform.position
+            position.x = self.e['Input'].mouse.get_ortho_x() + 540
+            position.y = self.e['Input'].mouse.get_ortho_y() + 360
+            position.x = (position.x // Settings.GRID_WIDTH) * Settings.GRID_WIDTH
+            position.y = (position.y // Settings.GRID_HEIGHT) * Settings.GRID_HEIGHT
             print(f'held: {self.holding_entity.transform.position}')
             print(f'mine: {self.e["Input"].mouse.get_ortho_x()}, {self.e["Input"].mouse.get_ortho_y()}')
 

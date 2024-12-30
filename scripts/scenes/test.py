@@ -4,11 +4,10 @@ from engine.misc.camera import Camera
 from ..constants.window import Screen
 from engine.components.spritesheet import Spritesheet
 from engine.misc.prefabs import Prefabs
-from engine.components.rigidbody import RigidBody
+from engine.ecs.entity import Entity
+from engine.components.gridlines import GridLines
 
 from engine.components.mouse_controls import MouseControls
-
-from engine.primitives import vec2, vec3
 
 class TestScene(Scene):
     def __init__(self):
@@ -19,11 +18,12 @@ class TestScene(Scene):
 
         self.load('level.json')
 
-        self.active_entity = self.entities[0]
-
         self.camera = Camera(Screen.RESOLUTION)
 
-        self.mouse_controls = MouseControls()
+        #self.mouse_controls = MouseControls()
+        self.editor_utils = Entity('LevelEditor')
+        self.editor_utils.add_component(MouseControls())
+        self.editor_utils.add_component(GridLines())
 
     def load_resources(self):
         self.e['Assets'].get_shader('vsDefault.glsl', 'default.glsl')
@@ -47,10 +47,10 @@ class TestScene(Scene):
 
             imgui.push_id(str(i))
             if imgui.image_button(tex_id, sprite_width, sprite_height, 
-                                  (tex_coords[0].x, tex_coords[0].y),
-                                  (tex_coords[2].x, tex_coords[2].y)):
-                entity = Prefabs.generate_sprite_object(sprite, sprite_width, sprite_height)
-                self.mouse_controls.pickup_entity(entity)
+                                  (tex_coords[2].x, tex_coords[0].y),
+                                  (tex_coords[0].x, tex_coords[2].y)):
+                entity = Prefabs.generate_sprite_object(sprite, 32, 32)
+                self.editor_utils.get_component(MouseControls).pickup_entity(entity)
             imgui.pop_id()
 
             last_button_pos = imgui.get_item_rect_max()
@@ -64,7 +64,7 @@ class TestScene(Scene):
     def update(self, dt):
         self.camera.update()
 
-        self.mouse_controls.update(dt)
+        self.editor_utils.update(dt)
         for entity in self.entities:
             entity.update(dt)
 

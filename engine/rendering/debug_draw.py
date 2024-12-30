@@ -61,7 +61,6 @@ class DebugDraw(ElementSingleton):
             'uProjection': self.e['Camera'].get_projection_matrix(),
             'uView': self.e['Camera'].get_view_matrix(),
         })
-        print(self.verticies)
 
 
     

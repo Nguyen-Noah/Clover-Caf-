@@ -7,7 +7,7 @@ from ..primitives.vec2 import vec2
 class Camera(ElementSingleton):
     def __init__(self, size):
         super().__init__()
-        self.size = size
+        self.size = vec2(*size)
         self.camera_offset = vec2()     # same as pos
         self.int_pos = vec2()
         self.target_pos = vec2()
@@ -24,10 +24,11 @@ class Camera(ElementSingleton):
         self.view_matrix = glm.mat4()
         self.inverse_projection = glm.mat4()
         self.inverse_view = glm.mat4()
+
         self.adjust_projection()
 
     def adjust_projection(self):
-        self.projection_matrix = glm.ortho(0.0, self.size[0] * self.zoom, 0.0, self.size[1] * self.zoom, 0.0, 100.0)
+        self.projection_matrix = glm.ortho(0.0, self.size[0], 0.0, self.size[1], 0.0, 100.0)
         self.inverse_projection = glm.inverse(self.projection_matrix)
 
     def get_view_matrix(self):
