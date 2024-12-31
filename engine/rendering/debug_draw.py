@@ -4,7 +4,7 @@ from ..utils.elements import ElementSingleton
 from .shader import Shader
 from .line2d import Line2D
 from ..primitives import vec2, vec3
-
+from ..utils.jmath import JMath
 
 class DebugDraw(ElementSingleton):
     MAX_LINES = 500
@@ -71,3 +71,44 @@ class DebugDraw(ElementSingleton):
         if len(self.lines) > DebugDraw.MAX_LINES:
             return
         self.lines.append(Line2D(from_point, to_point, color, lifetime))
+
+    def add_box_2d(self, center: vec2, dimensions: vec2, rotation=0, color=vec3(0, 1, 0), lifetime=1):
+        if len(self.lines) > DebugDraw.MAX_LINES:
+            return
+        bl = center - (dimensions / 2)
+        tr = center + (dimensions / 2)
+
+        verticies = [
+            vec2(bl.x, bl.y),
+            vec2(bl.x, tr.y),
+            vec2(tr.x, tr.y),
+            vec2(tr.x, bl.y)
+        ]
+
+        if rotation != 0:
+            for vert in verticies:
+                JMath.rotate(vert, rotation, center)
+
+        self.add_line_2d(verticies[0], verticies[1], color, lifetime)
+        self.add_line_2d(verticies[0], verticies[3], color, lifetime)
+        self.add_line_2d(verticies[1], verticies[2], color, lifetime)
+        self.add_line_2d(verticies[2], verticies[3], color, lifetime)
+
+    def add_circle(self, center, radius, color=vec3(0, 1, 0), lifetime=1):
+        if len(self.lines) > DebugDraw.MAX_LINES:
+            return
+        points = [0.0] * 20
+        increment = 360 / len(points)
+        curr_angle = 0
+
+        for i in range(len(points)):
+            tmp = vec2(radius, 0)
+            JMath.rotate(tmp, curr_angle, vec2())
+            points[i] = tmp + center
+
+            if i > 0:
+                self.add_line_2d(points[i - 1], points[i], color, lifetime)
+
+            curr_angle += increment
+
+        self.add_line_2d(points[-1], points[0], color, lifetime)

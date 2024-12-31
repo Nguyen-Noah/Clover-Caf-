@@ -12,7 +12,10 @@ class vec2:
     def __add__(self, other):
         if isinstance(other, vec2):
             return vec2(self.x + other.x, self.y + other.y)
-        raise TypeError("Can only add vec2 to vec2")
+        elif isinstance(other, (int, float)):
+            return vec2(self.x + other, self.y + other)
+        raise TypeError("Can only add vec2 to vec2 or a scalar (int/float)")
+
 
     def __sub__(self, other):
         if isinstance(other, vec2):

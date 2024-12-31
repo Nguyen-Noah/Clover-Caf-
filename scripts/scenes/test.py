@@ -6,6 +6,7 @@ from engine.components.spritesheet import Spritesheet
 from engine.misc.prefabs import Prefabs
 from engine.ecs.entity import Entity
 from engine.components.gridlines import GridLines
+from engine.primitives import vec2, vec3
 
 from engine.components.mouse_controls import MouseControls
 
@@ -64,7 +65,10 @@ class TestScene(Scene):
     def update(self, dt):
         self.camera.update()
 
+        
+        #self.e['Game'].debug_draw.add_box_2d(vec2(200, 200), vec2(64, 32), 30, lifetime=20)
         self.editor_utils.update(dt)
+
         for entity in self.entities:
             entity.update(dt)
 
