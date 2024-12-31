@@ -9,12 +9,14 @@ class Framebuffer(Element):
 
         self.texture = Texture(width=self.width, height=self.height)
         self.fbo = self.e['Game'].ctx.framebuffer(
-            color_attachments = [self.texture.texture],
-            depth_attachment = self.e['Game'].ctx.depth_renderbuffer((width, height))
+            color_attachments = [self.texture.texture]
         )
 
-    def bind(self):
+    def use(self):
         self.fbo.use()
 
     def unbind(self):
         self.e['Game'].ctx.screen.use()
+
+    def get_id(self):
+        return self.texture.get_id()

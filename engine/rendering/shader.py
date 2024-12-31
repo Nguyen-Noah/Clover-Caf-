@@ -87,10 +87,10 @@ class Shader(Element):
             vbo.release()
 
     def render(self, dest=None, uniforms={}, instances=None, render_method = moderngl.TRIANGLES):
-        if not dest:
+        """ if not dest:
             dest = self.e['Game'].ctx.screen
 
-        dest.use()
+        dest.use() """
 
         # Update loop
         tex_id = 0

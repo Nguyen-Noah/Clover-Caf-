@@ -1,6 +1,7 @@
-from ..utils.elements import ElementSingleton
-import imgui, sys
+import imgui
 from imgui.integrations.pygame import PygameRenderer
+from ..utils.elements import ElementSingleton
+from .game_view_window import GameViewWindow
 
 FONT_PATH = 'data/fonts'
 
@@ -56,7 +57,7 @@ class ImGui(ElementSingleton):
         scene.scene_imgui()
 
         imgui.show_test_window()
-
+        GameViewWindow.imgui(self.e)
         imgui.end()
 
         imgui.render()

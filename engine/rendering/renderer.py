@@ -33,6 +33,6 @@ class Renderer(ElementSingleton):
             new_batch.add_sprite(sprite)
             self.batches.sort(key=lambda batch: batch.z_index)
 
-    def render(self):
+    def render(self, dest=None):
         for batch in self.batches:
-            batch.render()
+            batch.render(dest=dest)

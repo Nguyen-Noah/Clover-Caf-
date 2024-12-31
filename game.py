@@ -13,6 +13,8 @@ from engine.rendering.framebuffer import Framebuffer
 
 class Game(engine.Game):
     def load(self):
+        self.aspect_ratio = Screen.ASPECT_RATIO[0] / Screen.ASPECT_RATIO[1]
+
         engine.init(
             resolution=Screen.RESOLUTION,
             input_path='data/config/key_mappings.json',
@@ -30,7 +32,8 @@ class Game(engine.Game):
         self.current_scene.start()
 
 
-        self.fbo = Framebuffer(1920, 1080)
+        self.fbo = Framebuffer(*Screen.RESOLUTION)
+        self.ctx.viewport = (0, 0, *Screen.RESOLUTION)
 
     def update(self):
         self.e['Window'].update()
@@ -39,11 +42,10 @@ class Game(engine.Game):
         #self.e['GSManager'].update()
 
         self.debug_draw.begin_frame()
-
+        
+        self.fbo.use()
         self.e['Game'].ctx.clear(0.90, 0.90, 0.90, 1.0)
         self.e['Game'].ctx.enable(moderngl.BLEND)
-
-        self.fbo.bind()
 
         self.debug_draw.draw()
         self.current_scene.update(self.e['Window'].dt)

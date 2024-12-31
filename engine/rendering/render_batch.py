@@ -153,7 +153,7 @@ class RenderBatch(Element):
     def has_texture(self, tex):
         return tex in self.textures
 
-    def render(self):
+    def render(self, dest=None):
         rebuffer_data = False
         for i in range(self.num_sprites):
             if self.sprites[i] is None:
@@ -168,7 +168,7 @@ class RenderBatch(Element):
             self.setup_buffers()
 
         self.create_texture_array()
-        self.shader.render(uniforms={
+        self.shader.render(dest=dest, uniforms={
             'uProjection': self.e['Camera'].get_projection_matrix(),
             'uView': self.e['Camera'].get_view_matrix(),
             'uTextures': self.texture_array
