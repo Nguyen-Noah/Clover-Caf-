@@ -6,6 +6,7 @@ from scripts.scenes.editor import TestScene
 from engine.rendering.debug_draw import DebugDraw
 from engine.rendering.framebuffer import Framebuffer
 from engine.rendering.picking_texture import PickingTexture
+from engine.misc.imgui import ImGui
 
 # TODO: - make all paths absolute when they are loaded
 #       - current level editor's origin is top left, 
@@ -36,9 +37,9 @@ class Game(engine.Game):
         self.fbo = Framebuffer(*Screen.RESOLUTION)
         self.ctx.viewport = (0, 0, *Screen.RESOLUTION)
 
-
         self.picking_texture = PickingTexture(*Screen.RESOLUTION)
         self.picking_shader = (('vsPickingShader.glsl', 'pickingShader.glsl'))
+        self.imgui = ImGui(Screen.RESOLUTION, self.picking_texture)
 
     def update(self):
         self.e['Window'].update()
@@ -52,11 +53,6 @@ class Game(engine.Game):
 
         self.e['Renderer'].bind_shader(self.picking_shader)
         self.current_scene.render()
-
-        if self.e['Input'].pressed('left_click'):
-            x = self.e['Input'].mouse.get_screen_x()
-            y = self.e['Input'].mouse.get_screen_y()
-            print(self.picking_texture.read_pixel(x, y))
 
         self.picking_texture.disable_writing()
         self.e['Game'].ctx.enable(moderngl.BLEND)

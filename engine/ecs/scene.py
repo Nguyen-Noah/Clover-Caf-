@@ -12,7 +12,6 @@ class Scene(Element):
         self.running = False
         self.entities = []
         self.renderer = Renderer()
-        self.active_entity = None
         self.loaded = False
 
     def init(self):
@@ -30,13 +29,12 @@ class Scene(Element):
             entity.start()
             self.renderer.add(entity)
 
-    def scene_imgui(self):
-        if self.active_entity is not None:
-            imgui.begin('Inspector')
-            self.active_entity.imgui()
-            imgui.end()
-
-        self.imgui()
+    def get_entity(self, uid):
+        result = next(
+            (entity for entity in self.entities if entity.uid == uid),
+            None
+        )
+        return result
 
     def imgui(self):
         pass

@@ -132,7 +132,6 @@ class RenderBatch(Element):
 
             # Load entity ID
             self.vertices[offset + 9] = sprite.entity.uid
-            print(sprite.entity.uid)
 
             offset += self.VERTEX_SIZE
 

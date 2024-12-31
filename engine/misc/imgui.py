@@ -1,12 +1,13 @@
 import imgui
 from imgui.integrations.pygame import PygameRenderer
 from ..utils.elements import ElementSingleton
-from .game_view_window import GameViewWindow
+from ..editor.game_view_window import GameViewWindow
+from ..editor.properties_window import PropertiesWindow
 
 FONT_PATH = 'data/fonts'
 
 class ImGui(ElementSingleton):
-    def __init__(self, resolution):
+    def __init__(self, resolution, picking_texture):
         super().__init__()
         imgui.create_context()
         self.renderer = PygameRenderer()
@@ -17,6 +18,8 @@ class ImGui(ElementSingleton):
         self.io.ini_file_name = 'imgui.ini'
 
         self.load_font('LEMONMILK.otf', 20)
+
+        self.properties_window = PropertiesWindow(picking_texture)
 
     def process_event(self, event):
         self.renderer.process_event(event)
@@ -51,13 +54,12 @@ class ImGui(ElementSingleton):
 
     def update(self, dt, scene):
         self.start_frame()
-
         self.setup_dock_space()
-
-        scene.scene_imgui()
-
+        scene.imgui()
         imgui.show_test_window()
         GameViewWindow.imgui(self.e)
+        self.properties_window.update(dt, scene)
+        self.properties_window.imgui()
         imgui.end()
 
         imgui.render()

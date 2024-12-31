@@ -4,7 +4,6 @@ from .misc.window import Window
 from .misc.input import Input
 from .rendering.shader import ShaderRegistry, Shader
 from .states.game_state import GSManager
-from .misc.imgui import ImGui
 
 def init(resolution=(640, 480), 
          caption='game', 
@@ -25,4 +24,3 @@ def init(resolution=(640, 480),
     state_manager = GSManager()
     input = Input(path=input_path, resolution=resolution)
     assets = Assets(spritesheet_path=spritesheet_path)
-    imgui = ImGui(resolution)
