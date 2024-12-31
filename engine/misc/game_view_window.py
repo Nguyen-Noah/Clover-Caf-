@@ -11,8 +11,17 @@ class GameViewWindow:
 
         imgui.set_cursor_pos_x(window_pos.x)
         imgui.set_cursor_pos_y(window_pos.y)
+
+        pos = imgui.get_cursor_screen_pos()
+        tl = vec2(*pos)
+        tl.x -= imgui.get_scroll_x()
+        tl.y -= imgui.get_scroll_y()
+
         tex_id = e['Game'].fbo.get_id()
         imgui.image(texture_id=tex_id, width=window_size.x, height=window_size.y, uv0=(0, 1), uv1=(1, 0))
+
+        e['Input'].mouse.game_viewport_pos = vec2(*tl)
+        e['Input'].mouse.game_viewport_size = vec2(*window_size)
 
         imgui.end()
 

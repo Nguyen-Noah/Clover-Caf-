@@ -4,7 +4,7 @@ from ..primitives.vec2 import vec2
 from ..components.component_deserializer import deserialize_component
 
 class Entity(Element):
-    ID_COUNTER = 0
+    ID_COUNTER = 1
 
     def __init__(self, name, z_index=0, transform=Transform()):
         super().__init__()

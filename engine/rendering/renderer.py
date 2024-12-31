@@ -6,7 +6,8 @@ from .render_batch import RenderBatch
 class Renderer(ElementSingleton):
     def __init__(self):
         super().__init__()
-        self.ctx = moderngl.create_context(require=330)
+        self.current_shader = ('vsDefault.glsl', 'default.glsl')
+        self.rebind_shader = False
 
         self.max_batch_size = 1000
         self.batches = []
@@ -33,6 +34,11 @@ class Renderer(ElementSingleton):
             new_batch.add_sprite(sprite)
             self.batches.sort(key=lambda batch: batch.z_index)
 
+    def bind_shader(self, shader: tuple):
+        self.current_shader = shader
+        self.rebind_shader = True
+
     def render(self, dest=None):
         for batch in self.batches:
-            batch.render(dest=dest)
+            batch.render(self.rebind_shader, dest=dest)
+        self.rebind_shader = False

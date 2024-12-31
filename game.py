@@ -1,10 +1,11 @@
 import moderngl, pygame
 import engine as engine
 from scripts.constants.window import Screen
-from scripts.scenes.test import TestScene
+from scripts.scenes.editor import TestScene
 
 from engine.rendering.debug_draw import DebugDraw
 from engine.rendering.framebuffer import Framebuffer
+from engine.rendering.picking_texture import PickingTexture
 
 # TODO: - make all paths absolute when they are loaded
 #       - current level editor's origin is top left, 
@@ -35,19 +36,41 @@ class Game(engine.Game):
         self.fbo = Framebuffer(*Screen.RESOLUTION)
         self.ctx.viewport = (0, 0, *Screen.RESOLUTION)
 
+
+        self.picking_texture = PickingTexture(*Screen.RESOLUTION)
+        self.picking_shader = (('vsPickingShader.glsl', 'pickingShader.glsl'))
+
     def update(self):
         self.e['Window'].update()
         self.e['ImGui'].start_frame()
         self.e['Input'].update()
-        #self.e['GSManager'].update()
+
+        # Render pass 1. Render to picking texture
+        self.picking_texture.enable_writing()
+        self.ctx.viewport = (0, 0, *Screen.RESOLUTION)
+        self.ctx.clear(0, 0, 0, 0)
+
+        self.e['Renderer'].bind_shader(self.picking_shader)
+        self.current_scene.render()
+
+        if self.e['Input'].pressed('left_click'):
+            x = self.e['Input'].mouse.get_screen_x()
+            y = self.e['Input'].mouse.get_screen_y()
+            print(self.picking_texture.read_pixel(x, y))
+
+        self.picking_texture.disable_writing()
+        self.e['Game'].ctx.enable(moderngl.BLEND)
+
+        # Render pass 2. Render actual game
 
         self.debug_draw.begin_frame()
         
         self.fbo.use()
         self.e['Game'].ctx.clear(0.90, 0.90, 0.90, 1.0)
-        self.e['Game'].ctx.enable(moderngl.BLEND)
+        
 
         self.debug_draw.draw()
+        self.e['Renderer'].bind_shader(('vsDefault.glsl', 'default.glsl'))
         self.current_scene.update(self.e['Window'].dt)
         self.current_scene.render()
 

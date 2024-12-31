@@ -27,10 +27,13 @@ class Mouse(ElementSingleton):
     def __init__(self, resolution):
         super().__init__()
         self.resolution = resolution
-        self.pos = vec2(0, 0)
-        self.ui_pos = vec2(0, 0)
-        self.movement = vec2(0 ,0)
+        self.pos = vec2()
+        self.ui_pos = vec2()
+        self.movement = vec2()
         self.scroll_y = 0
+
+        self.game_viewport_pos = vec2()
+        self.game_viewport_size = vec2()
 
     def reset(self):
         self.scroll_y = 0
@@ -38,21 +41,33 @@ class Mouse(ElementSingleton):
     def get_scroll_y(self):
         return self.scroll_y
     
+    def get_screen_x(self):
+        curr_x = self.pos.x - self.game_viewport_pos.x
+        curr_x = (curr_x / self.game_viewport_size.x) * self.resolution[0]
+
+        return curr_x
+
+    def get_screen_y(self):
+        curr_y = self.pos.y - self.game_viewport_pos.y
+        curr_y = self.resolution[1] - ((curr_y / self.game_viewport_size.y) * self.resolution[1])
+
+        return curr_y
+
     def get_ortho_x(self):
-        curr_x = self.pos.x
-        curr_x = (curr_x / self.resolution[0]) * 2 - 1
+        curr_x = self.pos.x - self.game_viewport_pos.x
+        curr_x = (curr_x / self.game_viewport_size.x) * 2 - 1
         tmp = glm.vec4(curr_x, 0, 0, 1)
-        tmp = tmp * self.e['Game'].current_scene.camera.inverse_projection
-        tmp = tmp * self.e['Game'].current_scene.camera.inverse_view
+        tmp *= self.e['Game'].current_scene.camera.inverse_projection
+        tmp *= self.e['Game'].current_scene.camera.inverse_view
 
         return tmp.x
 
     def get_ortho_y(self):
-        curr_y = self.resolution[1] - self.pos.y
-        curr_y = (curr_y / self.resolution[1]) * 2 - 1
+        curr_y = self.pos.y - self.game_viewport_pos.y
+        curr_y = -((curr_y / self.game_viewport_size.y) * 2 - 1)
         tmp = glm.vec4(0, curr_y, 0, 1)
-        tmp = tmp * self.e['Game'].current_scene.camera.inverse_projection
-        tmp = tmp * self.e['Game'].current_scene.camera.inverse_view
+        tmp *= self.e['Game'].current_scene.camera.inverse_projection
+        tmp *= self.e['Game'].current_scene.camera.inverse_view
 
         return tmp.y
 

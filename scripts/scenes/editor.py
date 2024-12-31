@@ -72,8 +72,5 @@ class TestScene(Scene):
         for entity in self.entities:
             entity.update(dt)
 
-        self.renderer.render(dest=self.e['Game'].fbo)
-
     def render(self):
-        pass
-        #self.tilemap.render()
+        self.renderer.render(dest=self.e['Game'].fbo)

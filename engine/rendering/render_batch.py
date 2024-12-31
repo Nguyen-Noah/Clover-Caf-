@@ -4,6 +4,8 @@ from ..rendering.shader import Shader
 from ..utils.elements import Element
 from ..components.sprite_renderer import SpriteRenderer
 
+SHADER_PATH = 'engine/rendering/shaders'
+
 # there is an issue where each batch starts up a new instance
 # of the same shader. this is because when they shared a shader
 # there was an issue where only the last batch was rendered
@@ -22,7 +24,8 @@ class RenderBatch(Element):
         self.COLOR_SIZE = 4
         self.TEX_COORDS_SIZE = 2
         self.TEX_ID_SIZE = 1
-        self.VERTEX_SIZE = self.POS_SIZE + self.COLOR_SIZE + self.TEX_COORDS_SIZE + self.TEX_ID_SIZE
+        self.ENTITY_ID_SIZE = 1
+        self.VERTEX_SIZE = self.POS_SIZE + self.COLOR_SIZE + self.TEX_COORDS_SIZE + self.TEX_ID_SIZE + self.ENTITY_ID_SIZE
 
         self.sprites = [None] * max_batch_size           # SpriteRenderer
         self.num_sprites = 0
@@ -33,7 +36,7 @@ class RenderBatch(Element):
 
         self.MAX_BATCH_SIZE = max_batch_size
         #self.shader = self.e['Assets'].get_shader('vsDefault.glsl', 'default.glsl')
-        self.shader = Shader('engine/rendering/shaders/vsDefault.glsl', 'engine/rendering/shaders/default.glsl')
+        self.shader = Shader(f'{SHADER_PATH}/vsDefault.glsl', f'{SHADER_PATH}/default.glsl')
 
 
         self.vertices = [0.0] * (self.MAX_BATCH_SIZE * 4 * self.VERTEX_SIZE)
@@ -43,11 +46,13 @@ class RenderBatch(Element):
 
         self.z_index = z_index
 
+        self.shader_cache = {'default': self.shader}          # terrible approach until i find a fix to above
+
     def setup_buffers(self):
         vbo = self.e['Game'].ctx.buffer(np.array(self.vertices, dtype='f4').tobytes())
         ibo = self.e['Game'].ctx.buffer(np.array(self.generate_indices(), dtype='i4').tobytes())
         self.shader.create_vao(
-            vbo_info=[(vbo, '2f 4f 2f 1f', 'aPos', 'aColor', 'aTexCoords', 'aTexId')],
+            vbo_info=[(vbo, '2f 4f 2f 1f 1f', 'aPos', 'aColor', 'aTexCoords', 'aTexId', 'aEntityId')],
             ibo=ibo)
 
     def generate_indices(self):
@@ -125,6 +130,10 @@ class RenderBatch(Element):
             # Load texture ID
             self.vertices[offset + 8] = tex_id
 
+            # Load entity ID
+            self.vertices[offset + 9] = sprite.entity.uid
+            print(sprite.entity.uid)
+
             offset += self.VERTEX_SIZE
 
     # MOVE TO ASSETS FILE
@@ -153,7 +162,22 @@ class RenderBatch(Element):
     def has_texture(self, tex):
         return tex in self.textures
 
-    def render(self, dest=None):
+    # TODO: theres a bug where the last item placed doesnt get picked up by the picking shader
+    #       this is most likely because the buffer needs to be rebuilt
+    def render(self, rebind_shader, dest=None):
+        if rebind_shader:           # also part of the issue named above
+            new_shader = self.e['Renderer'].current_shader
+            if new_shader[1].split('.')[0] not in self.shader_cache:
+                self.shader = Shader(vert_path=SHADER_PATH + '/' + new_shader[0], 
+                                    frag_path=SHADER_PATH + '/' + new_shader[1])
+                self.shader_cache[new_shader[1].split('.')[0]] = self.shader
+                
+            else:
+                self.shader = self.shader_cache[new_shader[1].split('.')[0]]
+
+            if self.shader.vao is None:
+                self.setup_buffers()
+            
         rebuffer_data = False
         for i in range(self.num_sprites):
             if self.sprites[i] is None:

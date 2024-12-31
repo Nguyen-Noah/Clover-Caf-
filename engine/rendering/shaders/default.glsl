@@ -3,6 +3,7 @@
 in vec4 fColor;
 in vec2 fTexCoords;
 in float fTexId;
+in float fEntityId;
 
 uniform sampler2DArray uTextures;
 
@@ -12,6 +13,6 @@ void main() {
     if (fTexId != 0) {
         color = fColor * texture(uTextures, vec3(fTexCoords, fTexId - 1.0));    // fTexId - 1.0 because the 0th element will be held for blank
     } else {
-        color = fColor - vec4(fTexId);
+        color = fColor - vec4(fTexId) - vec4(fEntityId);
     }
 }
