@@ -1,11 +1,18 @@
+import moderngl
 from ..utils.elements import Element
 from ..utils.assets import load_texture
 
 class Texture(Element):
-    def __init__(self, path):
+    def __init__(self, path="Generated", width=None, height=None):
         super().__init__()
         self.path = path
-        self.load_texture(self.path)
+        if path is not "Generated":
+            self.load_texture(self.path)
+        if width is not None and height is not None:
+            self.texture = self.e['Game'].ctx.texture((width, height), 3)
+            self.texture.repeat_x = True
+            self.texture.repeat_y = True
+            self.texture.filter = (moderngl.NEAREST, moderngl.NEAREST)
 
     def load_texture(self, path):
         self.texture = load_texture(path, self.e['Game'].ctx)

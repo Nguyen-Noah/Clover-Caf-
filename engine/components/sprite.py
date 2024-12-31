@@ -1,5 +1,5 @@
 from ..primitives.vec2 import vec2
-from ..assets.texture import Texture
+from ..rendering.texture import Texture
 
 class Sprite:
     def __init__(self, texture, width, height, tex_coords=[

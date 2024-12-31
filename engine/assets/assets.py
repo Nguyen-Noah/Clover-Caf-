@@ -1,7 +1,7 @@
 from ..components.spritesheet import Spritesheet
 from ..utils.elements import ElementSingleton
 from ..utils.assets import load_img_dir, load_img, pg2tex
-from .texture import Texture
+from ..rendering.texture import Texture
 from ..rendering.shader import Shader
 
 SHADER_PATH = 'engine/rendering/shaders'

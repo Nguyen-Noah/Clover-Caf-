@@ -4,6 +4,7 @@ from scripts.constants.window import Screen
 from scripts.scenes.test import TestScene
 
 from engine.rendering.debug_draw import DebugDraw
+from engine.rendering.framebuffer import Framebuffer
 
 # TODO: - make all paths absolute when they are loaded
 #       - current level editor's origin is top left, 
@@ -28,6 +29,9 @@ class Game(engine.Game):
         self.current_scene = TestScene()
         self.current_scene.start()
 
+
+        self.fbo = Framebuffer(1920, 1080)
+
     def update(self):
         self.e['Window'].update()
         self.e['ImGui'].start_frame()
@@ -39,9 +43,13 @@ class Game(engine.Game):
         self.e['Game'].ctx.clear(0.90, 0.90, 0.90, 1.0)
         self.e['Game'].ctx.enable(moderngl.BLEND)
 
+        self.fbo.bind()
+
         self.debug_draw.draw()
         self.current_scene.update(self.e['Window'].dt)
         self.current_scene.render()
+
+        self.fbo.unbind()
 
         self.e['ImGui'].update(self.e['Window'].dt, self.current_scene)
 
