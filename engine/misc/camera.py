@@ -8,7 +8,7 @@ class Camera(ElementSingleton):
     def __init__(self, size):
         super().__init__()
         self.size = vec2(*size)
-        self.camera_offset = vec2()     # same as pos
+        self.position = vec2()     # same as pos
         self.int_pos = vec2()
         self.target_pos = vec2()
         self.rate = 0.25
@@ -18,7 +18,6 @@ class Camera(ElementSingleton):
         self.screen_shake = 0
         self.shake_amount = 'medium'
         self.zoom = 1
-        self.scroll_sensitivity = 0.01
 
         self.projection_matrix = glm.mat4()
         self.view_matrix = glm.mat4()
@@ -28,14 +27,14 @@ class Camera(ElementSingleton):
         self.adjust_projection()
 
     def adjust_projection(self):
-        self.projection_matrix = glm.ortho(0.0, self.size[0], 0.0, self.size[1], 0.0, 100.0)
+        self.projection_matrix = glm.ortho(0.0, self.size[0] * self.zoom, 0.0, self.size[1] * self.zoom, 0.0, 100.0)
         self.inverse_projection = glm.inverse(self.projection_matrix)
 
     def get_view_matrix(self):
         camera_front = glm.vec3(0.0, 0.0, -1.0)
         camera_up = glm.vec3(0.0, 1.0, 0.0)
-        self.view_matrix = glm.lookAt(glm.vec3(self.camera_offset.x, self.camera_offset.y, 20.0),
-                                        camera_front + glm.vec3(self.camera_offset.x, self.camera_offset.y, 0.0),
+        self.view_matrix = glm.lookAt(glm.vec3(self.position.x, self.position.y, 20.0),
+                                        camera_front + glm.vec3(self.position.x, self.position.y, 0.0),
                                         camera_up)
         self.inverse_view = glm.inverse(self.view_matrix)
 
@@ -53,8 +52,8 @@ class Camera(ElementSingleton):
         self.true_pos = self.target_pos.copy()
 
     def move(self, movement):
-        self.camera_offset.x += movement[0]
-        self.camera_offset.y += movement[1]
+        self.position.x += movement[0]
+        self.position.y += movement[1]
 
     def set_tracked_entity(self, entity):
         self.track_entity = entity
@@ -82,41 +81,22 @@ class Camera(ElementSingleton):
             return vec2(target_pos.x - self.e['Window'].display.get_width() // 2, target_pos.y - self.e['Window'].get_height() // 2)
         
     def update(self):
-        if self.e['Input'].mouse.get_scroll_y() != 0:
-            add_value = abs(self.e['Input'].mouse.get_scroll_y() * self.scroll_sensitivity) ** (1 / self.zoom)
-            add_value *= -math.copysign(1.0, self.e['Input'].mouse.get_scroll_y())
-            self.zoom += add_value
-            self.adjust_projection()
-
-        self.int_pos = vec2(int(self.camera_offset.x), int(self.camera_offset.y))
-        
-        if self.e['Input'].holding('right'):
-            self.camera_offset.x += 4
-            #print(self.camera_offset)
-        if self.e['Input'].holding('left'):
-            self.camera_offset.x -= 4
-            #print(self.camera_offset)
-        if self.e['Input'].holding('down'):
-            self.camera_offset.y -= 4
-            #print(self.camera_offset)
-        if self.e['Input'].holding('up'):
-            self.camera_offset.y += 4
-            #print(self.camera_offset)
+        pass
 
         """ target = self.target
         if target:
-            self.camera_offset[0] += math.floor(target[0] - self.camera_offset[0]) / (self.rate / self.e['Window'].dt)
-            self.camera_offset[1] += math.floor(target[1] - self.camera_offset[1]) / (self.rate / self.e['Window'].dt)
+            self.position[0] += math.floor(target[0] - self.position[0]) / (self.rate / self.e['Window'].dt)
+            self.position[1] += math.floor(target[1] - self.position[1]) / (self.rate / self.e['Window'].dt)
 
         if self.restriction_point:
-            if self.camera_offset[0] + self.e['Window'].display.get_width() // 2 - self.restriction_point[0] > self.lock_distance[0]:
-                self.camera_offset[0] = self.restriction_point[0] - self.e['Window'].display.get_width() // 2 + self.lock_distance[0]
-            if self.camera_offset[0] + self.e['Window'].display.get_width() // 2 - self.restriction_point[0] < -self.lock_distance[0]:
-                self.camera_offset[0] = self.restriction_point[0] - self.e['Window'].display.get_width() // 2 - self.lock_distance[0]
-            if self.camera_offset[1] + self.e['Window'].display.get_height() // 2 - self.restriction_point[1] > self.lock_distance[1]:
-                self.camera_offset[1] = self.restriction_point[1] - self.e['Window'].display.get_height() // 2 + self.lock_distance[1]
-            if self.camera_offset[1] + self.e['Window'].display.get_height() // 2 - self.restriction_point[1] < -self.lock_distance[1]:
-                self.camera_offset[1] = self.restriction_point[1] - self.e['Window'].display.get_height() // 2 - self.lock_distance[1]
+            if self.position[0] + self.e['Window'].display.get_width() // 2 - self.restriction_point[0] > self.lock_distance[0]:
+                self.position[0] = self.restriction_point[0] - self.e['Window'].display.get_width() // 2 + self.lock_distance[0]
+            if self.position[0] + self.e['Window'].display.get_width() // 2 - self.restriction_point[0] < -self.lock_distance[0]:
+                self.position[0] = self.restriction_point[0] - self.e['Window'].display.get_width() // 2 - self.lock_distance[0]
+            if self.position[1] + self.e['Window'].display.get_height() // 2 - self.restriction_point[1] > self.lock_distance[1]:
+                self.position[1] = self.restriction_point[1] - self.e['Window'].display.get_height() // 2 + self.lock_distance[1]
+            if self.position[1] + self.e['Window'].display.get_height() // 2 - self.restriction_point[1] < -self.lock_distance[1]:
+                self.position[1] = self.restriction_point[1] - self.e['Window'].display.get_height() // 2 - self.lock_distance[1]
         
         if self.e['Input'].pressed('zoom_in'):
             self.zoom += 1

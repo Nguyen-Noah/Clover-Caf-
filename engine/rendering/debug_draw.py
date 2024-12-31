@@ -7,7 +7,7 @@ from ..primitives import vec2, vec3
 from ..utils.jmath import JMath
 
 class DebugDraw(ElementSingleton):
-    MAX_LINES = 500
+    MAX_LINES = 60
 
     def __init__(self):
         super().__init__()
@@ -30,9 +30,7 @@ class DebugDraw(ElementSingleton):
             self.started = True
 
         # remove dead lines
-        for i, line in enumerate(self.lines):
-            if line.begin_frame() < 0:
-                self.lines.pop(i)
+        self.lines = [line for line in self.lines if line.begin_frame() >= 0]
 
     def draw(self):
         if len(self.lines) <= 0:
@@ -55,12 +53,17 @@ class DebugDraw(ElementSingleton):
                 self.verticies[index + 5] = color.z
 
                 index += 6
+        """ self.verticies = [
+            0.0, 0.0, -10.0, 1.0, 0.0, 0.0,  # Start of line (red)
+            200.0, 200.0, -10.0, 0.0, 1.0, 0.0   # End of line (green)
+        ] """
 
         self.setup_buffers()
         self.shader.render(render_method=moderngl.LINES, uniforms={
             'uProjection': self.e['Camera'].get_projection_matrix(),
             'uView': self.e['Camera'].get_view_matrix(),
         })
+        print(self.verticies)
 
 
     

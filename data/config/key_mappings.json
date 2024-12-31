@@ -12,5 +12,7 @@
     "swap_weapon": ["button", 113], 
     "hide_ui": ["button", 1073741882],
     "zoom_in": ["mouse", 4],
-    "zoom_out": ["mouse", 5]
+    "zoom_out": ["mouse", 5],
+    "middle_click": ["mouse", 2],
+    "recenter": ["button", 46]
 }

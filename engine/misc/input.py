@@ -141,6 +141,7 @@ class Input(ElementSingleton):
         for state in self.input.values():
             state.update()
 
+        self.mouse.reset()
         self.e['Mouse'].update()
 
         for event in pygame.event.get():

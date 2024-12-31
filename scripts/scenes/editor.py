@@ -6,7 +6,7 @@ from engine.components.spritesheet import Spritesheet
 from engine.misc.prefabs import Prefabs
 from engine.ecs.entity import Entity
 from engine.components.gridlines import GridLines
-from engine.primitives import vec2, vec3
+from engine.components.editor_camera import EditorCamera
 
 from engine.components.mouse_controls import MouseControls
 
@@ -25,6 +25,7 @@ class TestScene(Scene):
         self.editor_utils = Entity('LevelEditor')
         self.editor_utils.add_component(MouseControls())
         self.editor_utils.add_component(GridLines())
+        self.editor_utils.add_component(EditorCamera(self.camera))
 
     def load_resources(self):
         self.e['Assets'].get_shader('vsDefault.glsl', 'default.glsl')
@@ -64,7 +65,7 @@ class TestScene(Scene):
 
     def update(self, dt):
         self.camera.update()
-
+        self.camera.adjust_projection()
         
         #self.e['Game'].debug_draw.add_box_2d(vec2(200, 200), vec2(64, 32), 30, lifetime=20)
         self.editor_utils.update(dt)
