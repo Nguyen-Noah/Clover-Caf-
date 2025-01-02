@@ -35,10 +35,8 @@ class Renderer(ElementSingleton):
             self.batches.sort(key=lambda batch: batch.z_index)
 
     def bind_shader(self, shader: tuple):
-        self.current_shader = shader
-        self.rebind_shader = True
+        self.current_shader = self.e['Assets'].get_shader(*shader)
 
-    def render(self, dest=None):
+    def render(self):
         for batch in self.batches:
-            batch.render(self.rebind_shader, dest=dest)
-        self.rebind_shader = False
+            batch.render()

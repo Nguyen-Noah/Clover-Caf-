@@ -3,26 +3,9 @@ from ..utils.elements import Element, ElementSingleton
 import moderngl, glm
 import numpy as np
 
-class ShaderRegistry(ElementSingleton):
-    def __init__(self):
-        super().__init__()
-        self.shaders = {}
-
-    def register_shader(self, shader):
-        name = shader.__class__.__name__
-        if name not in self.shaders:
-            self.shaders[name] = shader
-        else:
-            pass
-    
-    def delete_shader(self, shader):
-        if shader in self.shaders:
-            del self.shaders[shader]
-
 class Shader(Element):
     def __init__(self, vert_path, frag_path, geo_path=None):
         super().__init__()
-        self.e['ShaderRegistry'].register_shader(self)
         self.vertex = vert_path
         self.fragment = frag_path
         self.geometry = geo_path
@@ -35,7 +18,6 @@ class Shader(Element):
             self.program = self.e['Game'].ctx.program(
                 vertex_shader=read_f(self.vertex), 
                 fragment_shader=read_f(self.fragment))
-        self.vao = None
         self.vbo = []
 
         self.uniform_cache = {}
@@ -60,23 +42,6 @@ class Shader(Element):
         self.vbo.append(vbo)
         return vbo
 
-    def create_vao(self, vbo_info, ibo=None):
-        """
-        Creates a Vertex Array Object (VAO)
-
-        Parameters:
-            vbo_info: list of tuples - List containing VBO and attribute mapping information.
-                                        Format: [(vbo, format, *attributes), ...]
-            ibo: moderngl.Buffer or None - Optional Index Buffer Object (IBO)
-
-        Returns:
-            moderngl.VertexArray - The created VAO
-        """
-        if ibo:
-            self.vao = self.e['Game'].ctx.vertex_array(self.program, vbo_info, ibo)
-        else:
-            self.vao = self.e['Game'].ctx.vertex_array(self.program, vbo_info)
-
     def delete(self):
         self.program.release()
         if self.vao:
@@ -86,11 +51,7 @@ class Shader(Element):
         for vbo, _, _ in self.vbo_info:
             vbo.release()
 
-    def render(self, dest=None, uniforms={}, instances=None, render_method = moderngl.TRIANGLES):
-        """ if not dest:
-            dest = self.e['Game'].ctx.screen
-
-        dest.use() """
+    def render(self, vao, uniforms={}, instances=None, render_method = moderngl.TRIANGLES):
 
         # Update loop
         tex_id = 0
@@ -112,9 +73,9 @@ class Shader(Element):
 
         # Render with instances or default
         if instances:
-            self.vao.render(mode=render_method, instances=len(instances))
+            vao.render(mode=render_method, instances=len(instances))
         else:
-            self.vao.render(mode=render_method)
+            vao.render(mode=render_method)
         
         self.detatch_textures()
 

@@ -24,8 +24,6 @@ class MouseControls(Component, Element):
             position.y = self.e['Input'].mouse.get_ortho_y() + 360
             position.x = (position.x // Settings.GRID_WIDTH) * Settings.GRID_WIDTH
             position.y = (position.y // Settings.GRID_HEIGHT) * Settings.GRID_HEIGHT
-            print(f'held: {self.holding_entity.transform.position}')
-            print(f'mine: {self.e["Input"].mouse.get_ortho_x()}, {self.e["Input"].mouse.get_ortho_y()}')
 
             if self.e['Input'].pressed('left_click'):
                 self.place()

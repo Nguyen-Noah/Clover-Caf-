@@ -1,15 +1,9 @@
 import numpy as np
 import moderngl
-from ..rendering.shader import Shader
 from ..utils.elements import Element
 from ..components.sprite_renderer import SpriteRenderer
 
 SHADER_PATH = 'engine/rendering/shaders'
-
-# there is an issue where each batch starts up a new instance
-# of the same shader. this is because when they shared a shader
-# there was an issue where only the last batch was rendered
-# later down the road, this should be fixed
 
 class RenderBatch(Element):
     def __init__(self, z_index=0, max_batch_size=1000):
@@ -32,12 +26,11 @@ class RenderBatch(Element):
         self.has_room = True
 
         self.vao = None
+        self.picking_vao = None         # not the greatest approach, but it works
         self.vbo = None
 
         self.MAX_BATCH_SIZE = max_batch_size
-        #self.shader = self.e['Assets'].get_shader('vsDefault.glsl', 'default.glsl')
-        self.shader = Shader(f'{SHADER_PATH}/vsDefault.glsl', f'{SHADER_PATH}/default.glsl')
-
+        self.shader = self.e['Assets'].get_shader('vsDefault.glsl', 'default.glsl')
 
         self.vertices = [0.0] * (self.MAX_BATCH_SIZE * 4 * self.VERTEX_SIZE)
 
@@ -46,14 +39,23 @@ class RenderBatch(Element):
 
         self.z_index = z_index
 
-        self.shader_cache = {'default': self.shader}          # terrible approach until i find a fix to above
+        self.setup_buffers()
+
+        self.active_vao = self.vao
 
     def setup_buffers(self):
-        vbo = self.e['Game'].ctx.buffer(np.array(self.vertices, dtype='f4').tobytes())
+        self.vbo = self.e['Game'].ctx.buffer(np.array(self.vertices, dtype='f4').tobytes())
         ibo = self.e['Game'].ctx.buffer(np.array(self.generate_indices(), dtype='i4').tobytes())
-        self.shader.create_vao(
-            vbo_info=[(vbo, '2f 4f 2f 1f 1f', 'aPos', 'aColor', 'aTexCoords', 'aTexId', 'aEntityId')],
-            ibo=ibo)
+        self.vao = self.e['Game'].ctx.vertex_array(
+            self.shader.program,
+            [(self.vbo, '2f 4f 2f 1f 1f', 'aPos', 'aColor', 'aTexCoords', 'aTexId', 'aEntityId')],
+            ibo
+        )
+        self.picking_vao = self.e['Game'].ctx.vertex_array(
+            self.e['Assets'].get_shader('vsPickingShader.glsl', 'pickingShader.glsl').program,
+            [(self.vbo, '2f 4f 2f 1f 1f', 'aPos', 'aColor', 'aTexCoords', 'aTexId', 'aEntityId')],
+            ibo
+        )
 
     def generate_indices(self):
         elements = []
@@ -161,22 +163,7 @@ class RenderBatch(Element):
     def has_texture(self, tex):
         return tex in self.textures
 
-    # TODO: theres a bug where the last item placed doesnt get picked up by the picking shader
-    #       this is most likely because the buffer needs to be rebuilt
-    def render(self, rebind_shader, dest=None):
-        if rebind_shader:           # also part of the issue named above
-            new_shader = self.e['Renderer'].current_shader
-            if new_shader[1].split('.')[0] not in self.shader_cache:
-                self.shader = Shader(vert_path=SHADER_PATH + '/' + new_shader[0], 
-                                    frag_path=SHADER_PATH + '/' + new_shader[1])
-                self.shader_cache[new_shader[1].split('.')[0]] = self.shader
-                
-            else:
-                self.shader = self.shader_cache[new_shader[1].split('.')[0]]
-
-            if self.shader.vao is None:
-                self.setup_buffers()
-            
+    def render(self):
         rebuffer_data = False
         for i in range(self.num_sprites):
             if self.sprites[i] is None:
@@ -188,10 +175,17 @@ class RenderBatch(Element):
                 rebuffer_data = True
 
         if rebuffer_data:
-            self.setup_buffers()
+            self.vbo.write(np.array(self.vertices, dtype='f4').tobytes())
 
+        # temporary solution until i figure out dynamic program swapping
+        if self.e['Renderer'].current_shader == self.e['Assets'].get_shader('vsPickingShader.glsl', 'pickingShader.glsl'):
+            self.active_vao = self.picking_vao
+        else:
+            self.active_vao = self.vao
+
+        self.shader = self.e['Renderer'].current_shader
         self.create_texture_array()
-        self.shader.render(dest=dest, uniforms={
+        self.shader.render(vao=self.active_vao, uniforms={
             'uProjection': self.e['Camera'].get_projection_matrix(),
             'uView': self.e['Camera'].get_view_matrix(),
             'uTextures': self.texture_array

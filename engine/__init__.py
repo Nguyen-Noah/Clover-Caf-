@@ -2,7 +2,7 @@ from .assets.assets import Assets
 from .misc.game import Game
 from .misc.window import Window
 from .misc.input import Input
-from .rendering.shader import ShaderRegistry, Shader
+from .rendering.shader import Shader
 from .states.game_state import GSManager
 
 def init(resolution=(640, 480), 
@@ -20,7 +20,6 @@ def init(resolution=(640, 480),
          tilesize=(16, 16),
          dimensions=(16, 16)):
     window = Window(resolution=resolution, caption=caption, flags=flags, fps_cap=fps_cap, dt_cap=dt_cap, opengl=opengl, shader_path=shader_path)
-    shader_registry = ShaderRegistry()
     state_manager = GSManager()
     input = Input(path=input_path, resolution=resolution)
     assets = Assets(spritesheet_path=spritesheet_path)
