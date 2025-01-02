@@ -2,3 +2,4 @@
 *.drawio
 .vscode
 /venv
+.idea

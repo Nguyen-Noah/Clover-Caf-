@@ -34,6 +34,7 @@ class Scene(Element):
             (entity for entity in self.entities if entity.uid == uid),
             None
         )
+        print(uid)
         return result
 
     def imgui(self):

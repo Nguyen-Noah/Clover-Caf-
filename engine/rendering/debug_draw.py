@@ -7,7 +7,7 @@ from ..primitives import vec2, vec3
 from ..utils.jmath import JMath
 
 class DebugDraw(ElementSingleton):
-    MAX_LINES = 60
+    MAX_LINES = 500
 
     def __init__(self):
         super().__init__()
@@ -63,7 +63,7 @@ class DebugDraw(ElementSingleton):
             'uProjection': self.e['Camera'].get_projection_matrix(),
             'uView': self.e['Camera'].get_view_matrix(),
         })
-        print(self.verticies)
+        #print(self.verticies)
 
 
     

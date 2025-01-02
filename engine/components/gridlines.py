@@ -12,8 +12,8 @@ class GridLines(Component, Element):
         camera_pos = self.e['Camera'].position
         projection_size = self.e['Camera'].size
 
-        first_x = ((camera_pos.x / Settings.GRID_WIDTH) - 1) * Settings.GRID_WIDTH
-        first_y = ((camera_pos.y / Settings.GRID_HEIGHT) - 1) * Settings.GRID_HEIGHT
+        first_x = ((camera_pos.x // Settings.GRID_WIDTH) - 1) * Settings.GRID_WIDTH
+        first_y = ((camera_pos.y // Settings.GRID_HEIGHT) - 1) * Settings.GRID_HEIGHT
 
         num_vt_lines = (projection_size.x * self.e['Camera'].zoom / Settings.GRID_WIDTH) + 2
         num_hz_lines = (projection_size.y * self.e['Camera'].zoom / Settings.GRID_HEIGHT) + 2

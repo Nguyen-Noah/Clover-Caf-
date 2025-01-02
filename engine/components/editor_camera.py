@@ -15,19 +15,21 @@ class EditorCamera(Component, ElementSingleton):
         self.reset = False
         self.lerp_time = 0
 
+        self.listener = 'space'
+
     def update(self, dt):
-        if self.e['Input'].holding('middle_click') and self.drag_debounce > 0:
+        if self.e['Input'].holding(self.listener) and self.drag_debounce > 0:
             self.click_origin = vec2(self.e['Input'].mouse.get_ortho_x(), self.e['Input'].mouse.get_ortho_y())
             self.drag_debounce -= dt
             return
-        elif self.e['Input'].holding('middle_click'):
+        elif self.e['Input'].holding(self.listener):
             mouse_pos = vec2(self.e['Input'].mouse.get_ortho_x(), self.e['Input'].mouse.get_ortho_y())
             delta = mouse_pos - self.click_origin
             self.editor_camera.position -= delta * dt * self.drag_sensitivity
             #self.click_origin = self.click_origin * (1 - dt) + mouse_pos * dt
             self.click_origin = mouse_pos
 
-        if (self.drag_debounce <= 0 and not self.e['Input'].holding('middle_click')):
+        if (self.drag_debounce <= 0 and not self.e['Input'].holding(self.listener)):
             self.drag_debounce = 0.032
 
         if self.e['Input'].mouse.get_scroll_y() != 0:

@@ -29,18 +29,15 @@ class SpriteRenderer(Component):
         self.dirty = False
     
     def imgui(self):
-        c = imgui.color_edit4('Color Picker', *self.color, 
+        changed, im_vec = imgui.color_edit4('Color Picker', *self.color,
                               imgui.COLOR_EDIT_NO_INPUTS | 
                               imgui.COLOR_EDIT_ALPHA_BAR)
-        if c[0]:
-            new_color = vec4(*c[1])
-            self.set_color(new_color)
-            self.dirty = True
+        if changed:
+            self.set_color(vec4(*im_vec))
 
     def set_sprite(self, new_sprite):
         self.sprite = new_sprite
         self.dirty = True
-
 
     def set_color(self, new_color):
         if self.color != new_color:

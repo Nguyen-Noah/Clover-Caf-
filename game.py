@@ -38,7 +38,7 @@ class Game(engine.Game):
         self.ctx.viewport = (0, 0, *Screen.RESOLUTION)
 
         self.picking_texture = PickingTexture(*Screen.RESOLUTION)
-        self.picking_shader = (('vsPickingShader.glsl', 'pickingShader.glsl'))
+        self.picking_shader = ('vsPickingShader.glsl', 'pickingShader.glsl')
         self.imgui = ImGui(Screen.RESOLUTION, self.picking_texture)
 
     def update(self):
@@ -60,7 +60,7 @@ class Game(engine.Game):
         # Render pass 2. Render actual game
 
         self.debug_draw.begin_frame()
-        
+
         self.fbo.use()
         self.e['Game'].ctx.clear(0.90, 0.90, 0.90, 1.0)
         

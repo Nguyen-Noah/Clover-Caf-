@@ -63,4 +63,4 @@ class PickingTexture(Element):
         glBindFramebuffer(GL_READ_FRAMEBUFFER, prev_fbo)
 
         # Return the first component of the pixel (e.g., object ID) minus 1
-        return int(pixels[0]) - 1
+        return int(pixels[0])
