@@ -1,7 +1,6 @@
 import moderngl
 import numpy as np
 from ..utils.elements import ElementSingleton
-from .shader import Shader
 from .line2d import Line2D
 from ..primitives import vec2, vec3
 from ..utils.jmath import JMath
@@ -13,15 +12,20 @@ class DebugDraw(ElementSingleton):
         super().__init__()
         self.lines = []
         # 6 floats per vertex, 2 vertices per line
-        self.verticies = [0.0] * (DebugDraw.MAX_LINES * 6 * 2)
-        self.shader = Shader('engine/rendering/shaders/vsDebugLine2D.glsl', 'engine/rendering/shaders/debugLine2D.glsl')
+        self.vertices = [0.0] * (DebugDraw.MAX_LINES * 6 * 2)
+        self.shader = self.e['Assets'].get_shader('vsDebugLine2D.glsl', 'debugLine2D.glsl')
 
         self.started = False
+        self.vao = None
+        self.vbo = None
+        self.setup_buffers()
 
     def setup_buffers(self):
-        vbo = self.e['Game'].ctx.buffer(np.array(self.verticies, dtype='f4').tobytes())
-        self.shader.create_vao(
-            vbo_info=[(vbo, '3f 3f', 'aPos', 'aColor')]
+        self.vbo = self.e['Game'].ctx.buffer(np.array(self.vertices, dtype='f4').tobytes())
+
+        self.vao = self.e['Game'].ctx.vertex_array(
+            self.shader.program,
+            [(self.vbo, '3f 3f', 'aPos', 'aColor')]
         )
 
     def begin_frame(self):
@@ -43,27 +47,23 @@ class DebugDraw(ElementSingleton):
                 color = line.color
 
                 # load position
-                self.verticies[index] = position.x
-                self.verticies[index + 1] = position.y
-                self.verticies[index + 2] = -10
+                self.vertices[index] = position.x
+                self.vertices[index + 1] = position.y
+                self.vertices[index + 2] = -10
 
                 # load color
-                self.verticies[index + 3] = color.x
-                self.verticies[index + 4] = color.y
-                self.verticies[index + 5] = color.z
+                self.vertices[index + 3] = color.x
+                self.vertices[index + 4] = color.y
+                self.vertices[index + 5] = color.z
 
                 index += 6
-        """ self.verticies = [
-            0.0, 0.0, -10.0, 1.0, 0.0, 0.0,  # Start of line (red)
-            200.0, 200.0, -10.0, 0.0, 1.0, 0.0   # End of line (green)
-        ] """
 
-        self.setup_buffers()
-        self.shader.render(render_method=moderngl.LINES, uniforms={
+        self.vbo.write(np.array(self.vertices, dtype='f4').tobytes())
+
+        self.shader.render(vao=self.vao, render_method=moderngl.LINES, uniforms={
             'uProjection': self.e['Camera'].get_projection_matrix(),
             'uView': self.e['Camera'].get_view_matrix(),
         })
-        #print(self.verticies)
 
 
     

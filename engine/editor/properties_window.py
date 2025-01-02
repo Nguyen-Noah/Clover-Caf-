@@ -20,6 +20,5 @@ class PropertiesWindow(Element):
             x = self.e['Input'].mouse.get_screen_x()
             y = self.e['Input'].mouse.get_screen_y()
             entity_id = current_scene.get_entity(self.picking_texture.read_pixel(x, y))
-            print(entity_id)
             if entity_id is not None:
                 self.active_entity = entity_id

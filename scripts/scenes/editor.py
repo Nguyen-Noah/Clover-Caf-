@@ -1,4 +1,5 @@
-import imgui, math
+import imgui
+
 from engine.ecs.scene import Scene
 from engine.misc.camera import Camera
 from ..constants.window import Screen
@@ -20,6 +21,22 @@ class TestScene(Scene):
         self.load('level.json')
 
         self.camera = Camera(Screen.RESOLUTION)
+
+        # entity1 = Entity(
+        #     name=f'Obj (x, y)',
+        #     transform=Transform(vec2(32, 16), vec2(100, 100)),
+        #     z_index=1
+        # )
+        # entity1.add_component(SpriteRenderer(sprite=self.sprites.get_sprite(0)))
+        # self.add_entity_to_scene(entity1)
+        #
+        # entity2 = Entity(
+        #     name=f'Obj (x, y)',
+        #     transform=Transform(vec2(800, 56), vec2(100, 100)),
+        #     z_index=2
+        # )
+        # entity2.add_component(SpriteRenderer(sprite=self.sprites.get_sprite(5)))
+        # self.add_entity_to_scene(entity2)
 
         #self.mouse_controls = MouseControls()
         self.editor_utils = Entity('LevelEditor')
@@ -58,7 +75,7 @@ class TestScene(Scene):
             last_button_pos = imgui.get_item_rect_max()
             last_button_x2 = last_button_pos.x
             next_button_x2 = last_button_x2 + item_spacing.x + sprite_width
-            if (i + 1 < self.sprites.size() and next_button_x2 < window_x2):
+            if i + 1 < self.sprites.size() and next_button_x2 < window_x2:
                 imgui.same_line()
 
         imgui.end()
@@ -74,4 +91,4 @@ class TestScene(Scene):
             entity.update(dt)
 
     def render(self):
-        self.renderer.render(dest=self.e['Game'].fbo)
+        self.renderer.render()
