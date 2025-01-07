@@ -71,6 +71,8 @@ class Input:
 
         self.binding_listen = None
 
+
+
     def save_config(self):
         write_json(self.path, {binding: self.config[binding] for binding in self.config if binding not in self.hidden_keys})
 

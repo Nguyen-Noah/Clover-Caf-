@@ -2,12 +2,14 @@ from ..primitives.vec2 import vec2
 from ..rendering.texture import Texture
 
 class Sprite:
-    def __init__(self, texture, width, height, tex_coords=[
-            vec2(1, 1),
-            vec2(1, 0),
-            vec2(0, 0),
-            vec2(0, 1),
-        ]):
+    def __init__(self, texture, width, height, tex_coords=None):
+        if tex_coords is None:
+            tex_coords = [
+                vec2(1, 1),
+                vec2(1, 0),
+                vec2(0, 0),
+                vec2(0, 1),
+            ]
         self.texture = texture
         self.width = width
         self.height = height

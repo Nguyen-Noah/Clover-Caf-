@@ -59,7 +59,7 @@ class Window(ElementSingleton):
             
         self.display = pygame.display.set_mode(size, self.flags | self.fullscreen_flag)
         if not ignore_mgl:
-            self.e['Renderer'].ctx.viewport = 0, 0, size[0], size[1]
+            self.e['Game'].ctx.viewport = 0, 0, size[0], size[1]
         if fullscreen:
             self.resolution = (pygame.display.Info().current_w, pygame.display.Info().current_h)
         else:

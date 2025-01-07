@@ -1,7 +1,9 @@
 from .sprite_renderer import SpriteRenderer
 from .rigidbody import RigidBody
+from .transform import Transform
 
 component_registry = {
+    "Transform": Transform,
     "SpriteRenderer": SpriteRenderer,
     'RigidBody': RigidBody
 }

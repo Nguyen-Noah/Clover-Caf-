@@ -1,12 +1,10 @@
 from .component import Component
-from ..utils.elements import Element
 from ..utils.settings import Settings
 
 # pretty much a helper component
-class MouseControls(Component, Element):
+class MouseControls(Component):
     def __init__(self):
-        Component.__init__(self)
-        Element.__init__(self)
+        super().__init__()
         self.holding_entity = None
 
     def pickup_entity(self, entity):
@@ -20,8 +18,8 @@ class MouseControls(Component, Element):
         # temporary
         if self.holding_entity is not None:
             position = self.holding_entity.transform.position
-            position.x = self.e['Input'].mouse.get_ortho_x() + 540
-            position.y = self.e['Input'].mouse.get_ortho_y() + 360
+            position.x = self.e['Input'].mouse.get_ortho_x()
+            position.y = self.e['Input'].mouse.get_ortho_y()
             position.x = (position.x // Settings.GRID_WIDTH) * Settings.GRID_WIDTH
             position.y = (position.y // Settings.GRID_HEIGHT) * Settings.GRID_HEIGHT
 

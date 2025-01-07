@@ -1,12 +1,14 @@
 import imgui
-from ..utils.elements import Element
-from ..primitives.vec3 import vec3
-from ..primitives.vec4 import vec4
 
-class Component:
-    ID_COUNTER = 0      # gloabl to component
+from engine.editor.pimgui import PImGui
+from engine.utils.elements import Element
+from engine.primitives import vec2, vec3, vec4
+
+class Component(Element):
+    ID_COUNTER = 0      # global to component
 
     def __init__(self):
+        super().__init__()
         self.entity = None  
         self.uid = -1       # unique to object
 
@@ -17,22 +19,26 @@ class Component:
         pass
 
     def imgui(self):
+        ignore = ['Register', '_singleton', 'Uid']
         try:
             for field_name, value in vars(self).items():
                 field_type = type(value)
                 name = field_name.capitalize()
+                if name in ignore:
+                    continue
 
                 if field_type == int:
-                    im_val = [value]
-                    changed, im_val[0] = imgui.drag_int(f"{name}", im_val[0])
-                    if changed:
-                        setattr(self, field_name, im_val[0])
+                    c, val = PImGui.drag_int(name, value)
+                    if c:
+                        setattr(self, field_name, val)
 
                 elif field_type == float:
-                    im_val = [value]
-                    changed, im_val[0] = imgui.drag_float(f"{name}", im_val[0])
-                    if changed:
-                        setattr(self, field_name, im_val[0])
+                    c, val = PImGui.drag_float(name, value)
+                    if c:
+                        setattr(self, field_name, val)
+
+                elif field_type == vec2:
+                    PImGui.draw_vec2_control(name, value)
 
                 elif field_type == vec3:
                     im_vec = [value.x, value.y, value.z]
@@ -69,5 +75,3 @@ class Component:
             "type": self.__class__.__name__,
             "uid": self.uid
             }
-    
-    

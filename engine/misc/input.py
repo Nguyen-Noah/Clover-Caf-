@@ -26,21 +26,41 @@ class InputState:
 class Mouse(ElementSingleton):
     def __init__(self, resolution):
         super().__init__()
+        self.last_world_x = 0
+        self.last_world_y = 0
         self.resolution = resolution
         self.pos = vec2()
         self.ui_pos = vec2()
         self.movement = vec2()
+        self.last_pos = vec2()
         self.scroll_y = 0
+        self.button_held = None
+        self.moved = False
 
         self.game_viewport_pos = vec2()
         self.game_viewport_size = vec2()
+
+        self.world_x = 0
+        self.world_y = 0
+
+        self.dirty_x = True
+        self.dirty_y = True
+
+        self.world_dx = 0
+        self.world_dy = 0
+
+    def get_world_dx(self):
+        return self.world_x - self.last_world_x
+
+    def get_world_dy(self):
+        return self.world_y - self.last_world_y
 
     def reset(self):
         self.scroll_y = 0
 
     def get_scroll_y(self):
         return self.scroll_y
-    
+
     def get_screen_x(self):
         curr_x = self.pos.x - self.game_viewport_pos.x
         curr_x = (curr_x / self.game_viewport_size.x) * self.resolution[0]
@@ -54,28 +74,57 @@ class Mouse(ElementSingleton):
         return curr_y
 
     def get_ortho_x(self):
+        if self.dirty_x:
+            self.calc_ortho_x()
+        return self.world_x
+
+    def calc_ortho_x(self):
         curr_x = self.pos.x - self.game_viewport_pos.x
         curr_x = (curr_x / self.game_viewport_size.x) * 2 - 1
         tmp = glm.vec4(curr_x, 0, 0, 1)
-        tmp *= self.e['Game'].current_scene.camera.inverse_projection
         tmp *= self.e['Game'].current_scene.camera.inverse_view
+        tmp *= self.e['Game'].current_scene.camera.inverse_projection
 
-        return tmp.x
+        self.last_world_x = self.world_x
+        self.world_x = tmp.x + (self.resolution[0] // 2)
+        self.dirty_x = False
 
     def get_ortho_y(self):
+        if self.dirty_y:
+            self.calc_ortho_y()
+        return self.world_y
+
+    def calc_ortho_y(self):
         curr_y = self.pos.y - self.game_viewport_pos.y
         curr_y = -((curr_y / self.game_viewport_size.y) * 2 - 1)
         tmp = glm.vec4(0, curr_y, 0, 1)
-        tmp *= self.e['Game'].current_scene.camera.inverse_projection
         tmp *= self.e['Game'].current_scene.camera.inverse_view
+        tmp *= self.e['Game'].current_scene.camera.inverse_projection
 
-        return tmp.y
+        self.last_world_y = self.world_y
+        self.world_y = tmp.y + (self.resolution[1] // 2)
+        self.dirty_y = False
+
+    def is_dragging(self, button='left_click'):
+        return self.e['Input'].holding(button) and self.moved
 
     def update(self):
         mpos = pygame.mouse.get_pos()
         self.movement = vec2(mpos[0] - self.pos[0], mpos[1] - self.pos[1])
         self.pos = vec2(mpos[0], mpos[1])
         self.ui_pos = vec2(mpos[0] // 2, mpos[1] // 2)
+
+        if self.pos.x != self.last_pos.x:
+            self.dirty_x = True
+        if self.pos.y != self.last_pos.y:
+            self.dirty_y = True
+
+        if self.button_held:
+            self.moved = self.pos != self.last_pos
+
+        self.last_pos = self.pos
+
+imgui_ignore = [1073742049]
 
 class Input(ElementSingleton):
     def __init__(self, path, resolution):
@@ -146,7 +195,10 @@ class Input(ElementSingleton):
 
         for event in pygame.event.get():
 
-            self.e['ImGui'].process_event(event)
+            try:
+                self.e['ImGui'].process_event(event)
+            except Exception as e:
+                pass
 
             if (event.type == pygame.QUIT) or (event.type == pygame.KEYDOWN and event.key == 27):
                 self.e['Game'].quit()
@@ -163,6 +215,7 @@ class Input(ElementSingleton):
                         if self.config[mapping][0] == 'mouse':
                             if event.button == self.config[mapping][1]:
                                 self.input[mapping].press()
+                                self.mouse.button_held = mapping
                             if event.button == 4:
                                 self.mouse.scroll_y += 1
                             if event.button == 5:
@@ -172,6 +225,7 @@ class Input(ElementSingleton):
                     if self.config[mapping][0] == 'mouse':
                         if event.button == self.config[mapping][1]:
                             self.input[mapping].unpress()
+                            self.mouse.button_held = None
             
             if event.type == pygame.KEYDOWN:
                 if self.binding_listen:

@@ -1,4 +1,4 @@
-import imgui
+import imgui, pygame
 from imgui.integrations.pygame import PygameRenderer
 from ..utils.elements import ElementSingleton
 from ..editor.game_view_window import GameViewWindow
@@ -22,13 +22,28 @@ class ImGui(ElementSingleton):
         self.properties_window = PropertiesWindow(picking_texture)
 
     def process_event(self, event):
-        self.renderer.process_event(event)
+        self.renderer.process_event(event)  # Default PygameRenderer event handling
+
+        io = imgui.get_io()
+        mods = pygame.key.get_mods()
+
+        # Synchronize modifier keys
+        io.key_ctrl = mods & pygame.KMOD_CTRL
+        io.key_shift = mods & pygame.KMOD_SHIFT
+        io.key_alt = mods & pygame.KMOD_ALT
+        io.key_super = mods & pygame.KMOD_GUI
 
     def start_frame(self):
         try:
+            io = imgui.get_io()
+            io.key_ctrl = False
+            io.key_shift = False
+            io.key_alt = False
+            io.key_super = False
             imgui.new_frame()
         except imgui.core.ImGuiError as e:
             pass
+            #print(f"Error in ImGui.new_frame(): {e}")
 
     def load_font(self, font_path, font_size):
         io = imgui.get_io()

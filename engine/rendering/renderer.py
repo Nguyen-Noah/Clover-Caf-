@@ -21,7 +21,7 @@ class Renderer(ElementSingleton):
     def _add(self, sprite):
         added = False
         for batch in self.batches:
-            if batch.has_room and batch.z_index == sprite.entity.z_index:
+            if batch.can_accept(sprite) and batch.has_room and batch.z_index == sprite.entity.transform.z_index:
                 tex = sprite.get_texture()
                 if tex is None or batch.has_texture(tex) or batch.has_texture_room():
                     batch.add_sprite(sprite)
@@ -29,7 +29,8 @@ class Renderer(ElementSingleton):
                     break
 
         if not added:
-            new_batch = RenderBatch(z_index=sprite.entity.z_index, max_batch_size=self.max_batch_size)
+            texture_size = sprite.get_texture().size if sprite.get_texture() else None
+            new_batch = RenderBatch(z_index=sprite.entity.transform.z_index, max_batch_size=self.max_batch_size, texture_size=texture_size)
             self.batches.append(new_batch)
             new_batch.add_sprite(sprite)
             self.batches.sort(key=lambda batch: batch.z_index)

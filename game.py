@@ -1,4 +1,4 @@
-import moderngl, pygame
+import moderngl, pygame, io
 import engine as engine
 from scripts.constants.window import Screen
 from scripts.scenes.editor import TestScene
@@ -8,10 +8,30 @@ from engine.rendering.framebuffer import Framebuffer
 from engine.rendering.picking_texture import PickingTexture
 from engine.misc.imgui import ImGui
 
+import cProfile
+import pstats
+
 # TODO: - make all paths absolute when they are loaded
 #       - current level editor's origin is top left, 
 #         eventually make a new level editor with origin at bottom right
 #           - this is why all the rendering is upside down/zoom is weird
+
+def profile_run():
+    profiler = cProfile.Profile()
+    profiler.enable()
+
+    # Run the game
+    Game().run()
+
+    profiler.disable()
+
+    # Print profiling stats to the console or file
+    stream = io.StringIO()
+    stats = pstats.Stats(profiler, stream=stream)
+    stats.strip_dirs().sort_stats('cumulative').print_stats(20)  # Top 20 slowest calls
+    print(stream.getvalue())  # Prints to console
+
+PROFILE = True
 
 class Game(engine.Game):
     def load(self):
@@ -23,14 +43,15 @@ class Game(engine.Game):
             fps_cap=Screen.FPS,
             opengl=True,
             shader_path='scripts/rendering/shaders',
-            spritesheet_path='data/assets/spritesheets'
+            spritesheet_path='data/assets/spritesheets',
+            flags=pygame.RESIZABLE
             )
         self.ctx = moderngl.create_context(debug=True, require=330)
-        self.e['Assets'].load_folder('data/assets/floor', colorkey=(0, 0, 0))
         
         self.debug_draw = DebugDraw()
 
         self.current_scene = TestScene()
+        self.current_scene.init()
         self.current_scene.start()
 
 
@@ -78,7 +99,10 @@ class Game(engine.Game):
         pygame.display.flip()
 
 if __name__ == '__main__':
-    Game().run()
+    if PROFILE:
+        profile_run()
+    else:
+        Game().run()
 
 # fruit sushi
 # chocolate/dessert burrito

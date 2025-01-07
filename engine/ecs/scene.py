@@ -1,6 +1,7 @@
 import imgui
 from ..components.component import Component
 from .entity import Entity
+from ..components.transform import Transform
 from ..utils.elements import Element
 from ..rendering.renderer import Renderer
 from ..utils.io import write_json, read_json
@@ -29,6 +30,12 @@ class Scene(Element):
             entity.start()
             self.renderer.add(entity)
 
+    def create_entity(self, name):
+        entity = Entity(name)
+        entity.add_component(Transform())
+        entity.transform = entity.get_component(Transform)
+        return entity
+
     def get_entity(self, uid):
         result = next(
             (entity for entity in self.entities if entity.uid == uid),
@@ -41,7 +48,6 @@ class Scene(Element):
 
     def update(self, dt):
         pass
-
 
     # might want to add some safety checks here
     def load(self, path):
@@ -75,5 +81,6 @@ class Scene(Element):
     def save_exit(self):
         data = []
         for entity in self.entities:
-            data.append(entity.serialize())
+            if entity.do_serialization:
+                data.append(entity.serialize())
         write_json('level.json', data)

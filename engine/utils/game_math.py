@@ -7,3 +7,6 @@ def rectify(p1, p2):
 
 def clamp_between(value, min_offset=1, max_offset=4):
     return max(min_offset, min(value, max_offset))
+
+def round(value, target=1):
+    return (value // target) * target

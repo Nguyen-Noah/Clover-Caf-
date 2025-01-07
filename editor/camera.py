@@ -48,7 +48,7 @@ class Camera:
                     dis = math.sqrt((self.game.input.mouse.pos[1] - self.track_entity.center[1] + self.render_offset[1]) ** 2 + (self.game.input.mouse.pos[0] - self.track_entity.center[0] + self.render_offset[0]) ** 2)
                     target_pos[0] += math.cos(angle) * (dis / 8)
                     target_pos[1] += math.sin(angle) * (dis / 8)
-            return (target_pos[0] - self.game.window.display.get_width() // 2, target_pos[1] - self.game.window.display.get_height() // 2)
+            return target_pos[0] - self.game.window.display.get_width() // 2, target_pos[1] - self.game.window.display.get_height() // 2
 
     def update(self):
         self.int_pos = (int(self.camera_offset[0]), int(self.camera_offset[1]))
@@ -81,7 +81,7 @@ class Camera:
 
     @property
     def pos(self):
-        return (int(math.floor(self.camera_offset[0])), int(math.floor(self.camera_offset[1])))
+        return int(math.floor(self.camera_offset[0])), int(math.floor(self.camera_offset[1]))
     
     def __getitem__(self, item):
         return self.int_pos[item]

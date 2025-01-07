@@ -3,10 +3,9 @@ from .component import Component
 from ..utils.elements import ElementSingleton
 from ..primitives import vec2
 
-class EditorCamera(Component, ElementSingleton):
+class EditorCamera(Component):
     def __init__(self, editor_camera):
-        Component.__init__(self)
-        ElementSingleton.__init__(self)
+        super().__init__()
         self.editor_camera = editor_camera
         self.drag_debounce = 0.032
         self.drag_sensitivity = 180
@@ -29,7 +28,7 @@ class EditorCamera(Component, ElementSingleton):
             #self.click_origin = self.click_origin * (1 - dt) + mouse_pos * dt
             self.click_origin = mouse_pos
 
-        if (self.drag_debounce <= 0 and not self.e['Input'].holding(self.listener)):
+        if self.drag_debounce <= 0 and not self.e['Input'].holding(self.listener):
             self.drag_debounce = 0.032
 
         if self.e['Input'].mouse.get_scroll_y() != 0:

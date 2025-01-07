@@ -1,12 +1,13 @@
 import numpy as np
-import moderngl
-from ..utils.elements import Element
-from ..components.sprite_renderer import SpriteRenderer
+import moderngl, glm, math
+from engine.utils.elements import Element
+from engine.components.sprite_renderer import SpriteRenderer
+from engine.primitives import vec4
 
 SHADER_PATH = 'engine/rendering/shaders'
 
 class RenderBatch(Element):
-    def __init__(self, z_index=0, max_batch_size=1000):
+    def __init__(self, z_index=0, max_batch_size=1000, texture_size=None):
         super().__init__()
         """
         Vertex
@@ -24,7 +25,6 @@ class RenderBatch(Element):
         self.sprites = [None] * max_batch_size           # SpriteRenderer
         self.num_sprites = 0
         self.has_room = True
-
         self.vao = None
         self.picking_vao = None         # not the greatest approach, but it works
         self.vbo = None
@@ -38,6 +38,7 @@ class RenderBatch(Element):
         self.texture_array = None
 
         self.z_index = z_index
+        self.texture_size = texture_size
 
         self.setup_buffers()
 
@@ -62,7 +63,7 @@ class RenderBatch(Element):
         for i in range(self.MAX_BATCH_SIZE):
             self.load_element_indices(elements, i)
         return elements
-    
+
     def load_element_indices(self, elements, index):
         offset = 4 * index
 
@@ -75,6 +76,14 @@ class RenderBatch(Element):
         elements.append(offset + 1)
 
     def add_sprite(self, sprite: SpriteRenderer):
+        texture = sprite.get_texture()
+
+        if texture and self.texture_size and self.texture_size != texture.size:
+            raise ValueError("Texture size mismatch in batch")
+
+        if texture and not self.texture_size:
+            self.texture_size = texture.size
+
         index = self.num_sprites
         self.sprites[index] = sprite
         self.num_sprites += 1
@@ -87,6 +96,10 @@ class RenderBatch(Element):
 
         if self.num_sprites >= self.MAX_BATCH_SIZE:
             self.has_room = False
+
+    def can_accept(self, sprite):
+        texture = sprite.sprite.texture
+        return self.has_room and (self.texture_size is None or (texture and self.texture_size == texture.size))
 
     def load_vertex_properties(self, index):
         sprite = self.sprites[index]
@@ -103,7 +116,22 @@ class RenderBatch(Element):
                     tex_id = i + 1
                     break
 
-        # add vertices with the appropriate properties
+        is_rotated = sprite.entity.transform.rotation != 0.0
+        transform_matrix = glm.mat4(1.0)
+        if is_rotated:
+            transform_matrix = glm.translate(transform_matrix,
+                                             glm.vec3(sprite.entity.transform.position.x,
+                                                      sprite.entity.transform.position.y,
+                                                      0.0))
+            transform_matrix = glm.rotate(transform_matrix,
+                                          math.radians(sprite.entity.transform.rotation),
+                                          glm.vec3(0, 0, 1))
+            transform_matrix = glm.scale(transform_matrix,
+                                         glm.vec3(sprite.entity.transform.scale.x,
+                                                  sprite.entity.transform.scale.y,
+                                                  1.0))
+
+        # Add vertices with the appropriate properties
         x_add = 1.0
         y_add = 1.0
         for i in range(4):
@@ -114,10 +142,22 @@ class RenderBatch(Element):
             elif i == 3:
                 y_add = 1.0
 
-            # Load positions
             tr = sprite.entity.transform
-            self.vertices[offset] = tr.position.x + (x_add * tr.scale.x)
-            self.vertices[offset + 1] = tr.position.y + (y_add * tr.scale.y)
+
+            current_pos = glm.vec4(
+                sprite.entity.transform.position.x + (x_add * sprite.entity.transform.scale.x),
+                sprite.entity.transform.position.y + (y_add * sprite.entity.transform.scale.y),
+                0.0,
+                1.0
+            )
+
+            if is_rotated:
+                # Apply the transformation matrix to the local coordinates
+                current_pos = transform_matrix * glm.vec4(x_add, y_add, 0.0, 1.0)
+
+            # Load positions
+            self.vertices[offset] = current_pos.x
+            self.vertices[offset + 1] = current_pos.y
 
             # Load color
             self.vertices[offset + 2] = color[0]
@@ -139,11 +179,12 @@ class RenderBatch(Element):
 
     # MOVE TO ASSETS FILE
     def create_texture_array(self):
-        width, height = self.textures[0].size
+        width, height = self.texture_size if self.texture_size is not None else self.textures[0].size
         components = 4
 
         for tex in self.textures:
             if tex.size != (width, height):
+                self.sprite_conflict = True
                 break
 
         data_list = []

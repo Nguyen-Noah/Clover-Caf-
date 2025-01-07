@@ -61,7 +61,7 @@ def parse_spritesheet(surf, split_color=(0, 255, 255), scale=None, pg2tex=None):
             row_start = None
     return tiles
 
-def load_spritesheets(path, split_color=(0, 255, 255), colorkey=(0, 0, 0), scale=None, pg2tex=None):
+def load_spritesheets(path, split_color=(0, 255, 255), colorkey=(255, 255, 255), scale=None, pg2tex=None):
     spritesheets = load_img_dir(path, colorkey=colorkey,alpha=True)
 
     for spritesheet in spritesheets:

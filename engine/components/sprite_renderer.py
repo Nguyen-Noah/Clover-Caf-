@@ -40,6 +40,8 @@ class SpriteRenderer(Component):
         self.dirty = True
 
     def set_color(self, new_color):
+        # if new_color.x == 1:
+        #      print(f'old {self.color}; new {new_color}; diff {self.color != new_color}')
         if self.color != new_color:
             self.color = new_color
             self.dirty = True
