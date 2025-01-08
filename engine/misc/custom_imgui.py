@@ -1,5 +1,9 @@
 import imgui, pygame
 from imgui.integrations.pygame import PygameRenderer
+
+from ..observers.event_system import EventSystem
+from ..observers.events import EventType
+from ..observers.events.event import Event
 from ..utils.elements import ElementSingleton
 from ..editor.game_view_window import GameViewWindow
 from ..editor.properties_window import PropertiesWindow
@@ -63,9 +67,6 @@ class ImGui(ElementSingleton):
                 imgui.WINDOW_NO_BRING_TO_FRONT_ON_FOCUS | imgui.WINDOW_NO_NAV_FOCUS
         imgui.begin("Dockspace", True, window_flags)
         imgui.pop_style_var(2)
-
-        f = imgui.begin_menu_item('play', '', True, False)
-        print(f)
 
         # dockspace
         imgui.dockspace(imgui.get_id("Dockspace"))

@@ -1,12 +1,15 @@
 import moderngl, pygame, io
 import engine as engine
+from engine.ecs.entity import Entity
+from engine.observers.events import EventType
+from engine.observers.events.event import Event
 from scripts.constants.window import Screen
 from scripts.scenes.editor import TestScene
 
 from engine.rendering.debug_draw import DebugDraw
 from engine.rendering.framebuffer import Framebuffer
 from engine.rendering.picking_texture import PickingTexture
-from engine.misc.imgui import ImGui
+from engine.misc.custom_imgui import ImGui
 
 import cProfile
 import pstats
@@ -34,8 +37,21 @@ def profile_run():
 PROFILE = True
 
 class Game(engine.Game):
+    def __init__(self):
+        super().__init__()
+        self.imgui = None
+        self.picking_shader = None
+        self.picking_texture = None
+        self.fbo = None
+        self.current_scene = None
+        self.debug_draw = None
+        self.ctx = None
+        self.fps = None
+        self.aspect_ratio = None
+
     def load(self):
         self.aspect_ratio = Screen.ASPECT_RATIO[0] / Screen.ASPECT_RATIO[1]
+        self.fps = Screen.FPS
 
         engine.init(
             resolution=Screen.RESOLUTION,
@@ -46,7 +62,7 @@ class Game(engine.Game):
             spritesheet_path='data/assets/spritesheets',
             flags=pygame.RESIZABLE
             )
-        self.ctx = moderngl.create_context(debug=True, require=330)
+        self.ctx = moderngl.create_context(require=330)
         
         self.debug_draw = DebugDraw()
 
@@ -61,6 +77,12 @@ class Game(engine.Game):
         self.picking_texture = PickingTexture(*Screen.RESOLUTION)
         self.picking_shader = ('vsPickingShader.glsl', 'pickingShader.glsl')
         self.imgui = ImGui(Screen.RESOLUTION, self.picking_texture)
+
+    def on_notify(self, entity: Entity, event: Event):
+        if event.type == EventType.GAME_ENGINE_START_PLAY:
+            print('Game starting')
+        elif event.type == EventType.GAME_ENGINE_STOP_PLAY:
+            print('Ending play')
 
     def update(self):
         self.e['Window'].update()

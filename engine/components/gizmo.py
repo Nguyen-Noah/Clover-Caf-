@@ -7,7 +7,8 @@ from engine.misc.prefabs import Prefabs
 from engine.primitives import vec2, vec4
 
 
-#FIX COLOR SETTING, CURRENTLY CAUSING FPS ISSUES
+# FIX COLOR SETTING, CURRENTLY CAUSING FPS ISSUES
+# GIZMOS DONT WORK WHEN CAMERA IS CHANGED
 class Gizmo(Component):
     def __init__(self, arrow_sprite: Sprite):
         super().__init__()

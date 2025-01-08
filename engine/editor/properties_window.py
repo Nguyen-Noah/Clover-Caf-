@@ -13,6 +13,11 @@ class PropertiesWindow(Element):
     def imgui(self):
             if self.active_entity is not None:
                 imgui.begin('Properties')
+
+                if imgui.begin_popup_context_window('Component Adder'):
+                    if imgui.menu_item('Add example'):
+                        pass
+
                 self.active_entity.imgui()
                 imgui.end()
 
