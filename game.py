@@ -3,8 +3,9 @@ import engine as engine
 from engine.ecs.entity import Entity
 from engine.observers.events import EventType
 from engine.observers.events.event import Event
+from engine.scenes.scene import Scene
+from engine.scenes.scene_initializer import SceneInitializer
 from scripts.constants.window import Screen
-from scripts.scenes.editor import TestScene
 
 from engine.rendering.debug_draw import DebugDraw
 from engine.rendering.framebuffer import Framebuffer
@@ -13,6 +14,9 @@ from engine.misc.custom_imgui import ImGui
 
 import cProfile
 import pstats
+
+from scripts.scenes.editor_initializer import EditorInitializer
+
 
 # TODO: - make all paths absolute when they are loaded
 #       - current level editor's origin is top left, 
@@ -50,6 +54,7 @@ class Game(engine.Game):
         self.aspect_ratio = None
 
     def load(self):
+        self.resolution = Screen.RESOLUTION
         self.aspect_ratio = Screen.ASPECT_RATIO[0] / Screen.ASPECT_RATIO[1]
         self.fps = Screen.FPS
 
@@ -66,10 +71,7 @@ class Game(engine.Game):
         
         self.debug_draw = DebugDraw()
 
-        self.current_scene = TestScene()
-        self.current_scene.init()
-        self.current_scene.start()
-
+        self.change_scene(EditorInitializer())
 
         self.fbo = Framebuffer(*Screen.RESOLUTION)
         self.ctx.viewport = (0, 0, *Screen.RESOLUTION)
@@ -77,6 +79,14 @@ class Game(engine.Game):
         self.picking_texture = PickingTexture(*Screen.RESOLUTION)
         self.picking_shader = ('vsPickingShader.glsl', 'pickingShader.glsl')
         self.imgui = ImGui(Screen.RESOLUTION, self.picking_texture)
+
+    def change_scene(self, scene: SceneInitializer):
+        if self.current_scene is not None:
+            pass
+
+        self.current_scene = Scene(scene)
+        self.current_scene.init()
+        self.current_scene.start()
 
     def on_notify(self, entity: Entity, event: Event):
         if event.type == EventType.GAME_ENGINE_START_PLAY:
@@ -106,7 +116,7 @@ class Game(engine.Game):
 
         self.fbo.use()
         self.e['Game'].ctx.clear(0.90, 0.90, 0.90, 1.0)
-        
+
 
         self.debug_draw.draw()
         self.e['Renderer'].bind_shader(('vsDefault.glsl', 'default.glsl'))

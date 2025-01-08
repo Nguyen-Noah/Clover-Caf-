@@ -13,4 +13,4 @@ class Screen:
     ASPECT_RATIO: tuple = aspect_ratio(WIDTH, HEIGHT)
     SCALE_RATIO: int = 3
     TITLE: str = "Farming Game Idk the Name Yet"
-    FPS: int = 60
+    FPS: int = 240

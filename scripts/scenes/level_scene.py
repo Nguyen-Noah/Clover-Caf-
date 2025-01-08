@@ -1,4 +1,4 @@
-from engine.ecs.scene import Scene
+from engine.scenes.scene import Scene
 
 class LevelScene(Scene):
     def __init__(self):

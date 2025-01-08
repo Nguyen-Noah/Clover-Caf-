@@ -7,8 +7,8 @@ class EditorCamera(Component):
     def __init__(self, editor_camera):
         super().__init__()
         self.editor_camera = editor_camera
-        self.drag_debounce = 0.016#0.032
-        self.drag_sensitivity = 60#180
+        self.drag_debounce = 0.032#0.016
+        self.drag_sensitivity = 180#60
         self.click_origin = vec2()
         self.scroll_sensitivity = 0.01
         self.reset = False

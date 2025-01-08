@@ -1,22 +1,28 @@
 import imgui
-from ..components.component import Component
-from .entity import Entity
-from ..components.transform import Transform
-from ..utils.elements import Element
-from ..rendering.renderer import Renderer
-from ..utils.io import write_json, read_json
+
+from engine.misc.camera import Camera
+from engine.components.component import Component
+from engine.ecs.entity import Entity
+from engine.components.transform import Transform
+from engine.utils.elements import Element
+from engine.rendering.renderer import Renderer
+from engine.utils.io import write_json, read_json
 
 class Scene(Element):
-    def __init__(self):
+    def __init__(self, scene_initializer):
         super().__init__()
+        self.renderer = Renderer()
         self.camera = None
         self.running = False
         self.entities = []
-        self.renderer = Renderer()
         self.loaded = False
 
+        self._scene_initializer = scene_initializer
+
     def init(self):
-        pass
+        self.camera = Camera(self.e['Game'].resolution)
+        self._scene_initializer.load_resources(self)
+        self._scene_initializer.init(self)
 
     def start(self):
         for entity in self.entities:
@@ -44,10 +50,16 @@ class Scene(Element):
         return result
 
     def imgui(self):
-        pass
+        self._scene_initializer.imgui()
 
     def update(self, dt):
-        pass
+        self.camera.adjust_projection()
+
+        for entity in self.entities:
+            entity.update(dt)
+
+    def render(self):
+        self.renderer.render()
 
     # might want to add some safety checks here
     def load(self, path):

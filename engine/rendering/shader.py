@@ -77,7 +77,7 @@ class Shader(Element):
         else:
             vao.render(mode=render_method)
         
-        self.detatch_textures()
+        #self.detatch_textures()
 
     def _update_uniform(self, uniform, value, tex_id):
         if isinstance(value, moderngl.Texture) or isinstance(value, moderngl.TextureArray):

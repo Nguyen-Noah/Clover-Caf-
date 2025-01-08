@@ -1,40 +1,37 @@
 import imgui
 
 from engine.components.gizmo_system import GizmoSystem
-from engine.ecs.scene import Scene
-from engine.misc.camera import Camera
-from ..constants.window import Screen
 from engine.components.spritesheet import Spritesheet
 from engine.misc.prefabs import Prefabs
-from engine.ecs.entity import Entity
 from engine.components.gridlines import GridLines
 from engine.components.editor_camera import EditorCamera
 
 from engine.components.mouse_controls import MouseControls
+from engine.scenes.scene import Scene
+from engine.scenes.scene_initializer import SceneInitializer
 
-class TestScene(Scene):
+
+class EditorInitializer(SceneInitializer):
     def __init__(self):
         print('Creating test scene')
         super().__init__()
-        self.load_resources()
+
+    def init(self, scene: Scene):
         self.sprites = self.e['Assets'].get_spritesheet('veggies.png')
         self.tiles = self.e['Assets'].get_spritesheet('interior_free.png')      # test
         self.gizmos = self.e['Assets'].get_spritesheet('gizmos.png')
 
-        self.editor_utils = self.create_entity('LevelEditor')
+        scene.load('level.json')
 
-    def init(self):
-        self.load('level.json')
-
-        self.camera = Camera(Screen.RESOLUTION)
-
+        self.editor_utils = scene.create_entity('LevelEditor')
+        self.editor_utils.set_no_serialize()
         self.editor_utils.add_component(MouseControls())
         self.editor_utils.add_component(GridLines())
-        self.editor_utils.add_component(EditorCamera(self.camera))
+        self.editor_utils.add_component(EditorCamera(scene.camera))
         self.editor_utils.add_component(GizmoSystem(self.gizmos))
-        self.editor_utils.start()
+        scene.add_entity_to_scene(self.editor_utils)
 
-    def load_resources(self):
+    def load_resources(self, scene: Scene):
         self.e['Assets'].get_shader('vsDefault.glsl', 'default.glsl')
         self.e['Assets'].add_spritesheet('gizmos.png',
                                          Spritesheet(self.e['Assets'].get_texture('gizmos.png'),
@@ -59,7 +56,7 @@ class TestScene(Scene):
         item_spacing = imgui.get_style().item_spacing
         window_x2 = window_pos.x + window_size.x
 
-        active = self.tiles
+        active = self.sprites
         for i in range(active.size()):
             sprite = active.get_sprite(i)
             sprite_width = sprite.width * 4
@@ -82,16 +79,3 @@ class TestScene(Scene):
                 imgui.same_line()
 
         imgui.end()
-
-    def update(self, dt):
-        self.camera.update()
-        self.camera.adjust_projection()
-        
-        #self.e['Game'].debug_draw.add_box_2d(vec2(200, 200), vec2(64, 32), 30, lifetime=20)
-        self.editor_utils.update(dt)
-
-        for entity in self.entities:
-            entity.update(dt)
-
-    def render(self):
-        self.renderer.render()

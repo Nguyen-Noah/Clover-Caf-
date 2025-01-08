@@ -2,7 +2,6 @@ import numpy as np
 import moderngl, glm, math
 from engine.utils.elements import Element
 from engine.components.sprite_renderer import SpriteRenderer
-from engine.primitives import vec4
 
 SHADER_PATH = 'engine/rendering/shaders'
 
@@ -32,7 +31,7 @@ class RenderBatch(Element):
         self.MAX_BATCH_SIZE = max_batch_size
         self.shader = self.e['Assets'].get_shader('vsDefault.glsl', 'default.glsl')
 
-        self.vertices = [0.0] * (self.MAX_BATCH_SIZE * 4 * self.VERTEX_SIZE)
+        self.vertices = np.zeros((self.MAX_BATCH_SIZE * 4 * self.VERTEX_SIZE), dtype=np.float32)
 
         self.textures = []
         self.texture_array = None
@@ -155,25 +154,13 @@ class RenderBatch(Element):
                 # Apply the transformation matrix to the local coordinates
                 current_pos = transform_matrix * glm.vec4(x_add, y_add, 0.0, 1.0)
 
-            # Load positions
-            self.vertices[offset] = current_pos.x
-            self.vertices[offset + 1] = current_pos.y
-
-            # Load color
-            self.vertices[offset + 2] = color[0]
-            self.vertices[offset + 3] = color[1]
-            self.vertices[offset + 4] = color[2]
-            self.vertices[offset + 5] = color[3]
-
-            # Load texture coordinates
-            self.vertices[offset + 6] = tex_coords[i].x
-            self.vertices[offset + 7] = tex_coords[i].y
-
-            # Load texture ID
-            self.vertices[offset + 8] = tex_id
-
-            # Load entity ID
-            self.vertices[offset + 9] = sprite.entity.uid
+            self.vertices[offset:offset + self.VERTEX_SIZE] = [
+                current_pos.x, current_pos.y,
+                color[0], color[1], color[2], color[3],
+                tex_coords[i].x, tex_coords[i].y,
+                tex_id,
+                sprite.entity.uid
+            ]
 
             offset += self.VERTEX_SIZE
 
@@ -216,7 +203,7 @@ class RenderBatch(Element):
                 rebuffer_data = True
 
         if rebuffer_data:
-            self.vbo.write(np.array(self.vertices, dtype='f4').tobytes())
+            self.vbo.write(self.vertices.tobytes())
 
         # temporary solution until i figure out dynamic program swapping
         if self.e['Renderer'].current_shader == self.e['Assets'].get_shader('vsPickingShader.glsl', 'pickingShader.glsl'):
@@ -225,7 +212,6 @@ class RenderBatch(Element):
             self.active_vao = self.vao
 
         self.shader = self.e['Renderer'].current_shader
-        self.create_texture_array()
         self.shader.render(vao=self.active_vao, uniforms={
             'uProjection': self.e['Camera'].get_projection_matrix(),
             'uView': self.e['Camera'].get_view_matrix(),
