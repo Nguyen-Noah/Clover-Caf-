@@ -64,6 +64,9 @@ class ImGui(ElementSingleton):
         imgui.begin("Dockspace", True, window_flags)
         imgui.pop_style_var(2)
 
+        f = imgui.begin_menu_item('play', '', True, False)
+        print(f)
+
         # dockspace
         imgui.dockspace(imgui.get_id("Dockspace"))
 
