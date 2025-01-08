@@ -35,6 +35,15 @@ class Renderer(ElementSingleton):
             new_batch.add_sprite(sprite)
             self.batches.sort(key=lambda batch: batch.z_index)
 
+    def destroy_entity(self, entity):
+        if entity.get_component(SpriteRenderer) is None:
+            return
+
+        for batch in self.batches:
+            if batch.destroy_if_exists(entity):
+                return
+
+
     def bind_shader(self, shader: tuple):
         self.current_shader = self.e['Assets'].get_shader(*shader)
 

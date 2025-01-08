@@ -12,10 +12,14 @@ class Component(Element):
         self.entity = None  
         self.uid = -1       # unique to object
 
+    def init(max_id):
+        Component.ID_COUNTER = max_id
+
     def start(self):
         pass
 
-    def update(self, dt):
+    # can be used for things like: weapons breaking sound, hit sounds, etc.
+    def destroy(self):
         pass
 
     def imgui(self):
@@ -67,8 +71,11 @@ class Component(Element):
             self.uid = Component.ID_COUNTER
             Component.ID_COUNTER += 1
 
-    def init(max_id):
-        Component.ID_COUNTER = max_id
+    def editor_update(self, dt):
+        pass
+
+    def update(self, dt):
+        pass
 
     def serialize(self):
         return {

@@ -1,3 +1,4 @@
+from engine.utils.game_math import round
 from engine.components.gizmo import Gizmo
 from engine.components.sprite import Sprite
 
@@ -7,12 +8,7 @@ class ScaleGizmo(Gizmo):
         self.last_dy = 0
         self.last_dx = 0
 
-    def update(self, dt):
-        if self.e['Input'].holding('shift'):
-            self.snap = True
-        else:
-            self.snap = False
-
+    def editor_update(self, dt):
         if self.last_dx == self.e['Mouse'].get_world_dx():
             dx = 0
         else:
@@ -31,4 +27,4 @@ class ScaleGizmo(Gizmo):
             elif self.y_active and not self.x_active:
                 self.active_entity.transform.scale.y += dy
 
-        super().update(dt)
+        super().editor_update(dt)

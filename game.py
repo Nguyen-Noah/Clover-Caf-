@@ -43,6 +43,9 @@ PROFILE = True
 class Game(engine.Game):
     def __init__(self):
         super().__init__()
+        self.resolution = Screen.RESOLUTION
+        self.aspect_ratio = Screen.ASPECT_RATIO[0] / Screen.ASPECT_RATIO[1]
+        self.fps = Screen.FPS
         self.imgui = None
         self.picking_shader = None
         self.picking_texture = None
@@ -50,14 +53,9 @@ class Game(engine.Game):
         self.current_scene = None
         self.debug_draw = None
         self.ctx = None
-        self.fps = None
-        self.aspect_ratio = None
+        self.runtime_playing = False
 
     def load(self):
-        self.resolution = Screen.RESOLUTION
-        self.aspect_ratio = Screen.ASPECT_RATIO[0] / Screen.ASPECT_RATIO[1]
-        self.fps = Screen.FPS
-
         engine.init(
             resolution=Screen.RESOLUTION,
             input_path='data/config/key_mappings.json',
@@ -68,6 +66,9 @@ class Game(engine.Game):
             flags=pygame.RESIZABLE
             )
         self.ctx = moderngl.create_context(require=330)
+        self.picking_texture = PickingTexture(*Screen.RESOLUTION)
+        self.picking_shader = ('vsPickingShader.glsl', 'pickingShader.glsl')
+        self.imgui = ImGui(Screen.RESOLUTION, self.picking_texture)
         
         self.debug_draw = DebugDraw()
 
@@ -76,14 +77,11 @@ class Game(engine.Game):
         self.fbo = Framebuffer(*Screen.RESOLUTION)
         self.ctx.viewport = (0, 0, *Screen.RESOLUTION)
 
-        self.picking_texture = PickingTexture(*Screen.RESOLUTION)
-        self.picking_shader = ('vsPickingShader.glsl', 'pickingShader.glsl')
-        self.imgui = ImGui(Screen.RESOLUTION, self.picking_texture)
-
     def change_scene(self, scene: SceneInitializer):
         if self.current_scene is not None:
-            pass
+            self.current_scene.destroy()
 
+        self.imgui.properties_window.active_entity = None
         self.current_scene = Scene(scene)
         self.current_scene.init()
         self.current_scene.start()
@@ -91,8 +89,17 @@ class Game(engine.Game):
     def on_notify(self, entity: Entity, event: Event):
         if event.type == EventType.GAME_ENGINE_START_PLAY:
             print('Game starting')
+            self.runtime_playing = True
+            self.current_scene.save()
+            self.change_scene(EditorInitializer())
         elif event.type == EventType.GAME_ENGINE_STOP_PLAY:
             print('Ending play')
+            self.runtime_playing = False
+            self.change_scene(EditorInitializer())
+        elif event.type == EventType.LOAD_LEVEL:
+            self.change_scene(EditorInitializer())
+        elif event.type == EventType.SAVE_LEVEL:
+            self.current_scene.save()
 
     def update(self):
         self.e['Window'].update()
@@ -120,7 +127,10 @@ class Game(engine.Game):
 
         self.debug_draw.draw()
         self.e['Renderer'].bind_shader(('vsDefault.glsl', 'default.glsl'))
-        self.current_scene.update(self.e['Window'].dt)
+        if self.runtime_playing:
+            self.current_scene.update(self.e['Window'].dt)
+        else:
+            self.current_scene.editor_update(self.e['Window'].dt)
         self.current_scene.render()
 
         self.fbo.unbind()

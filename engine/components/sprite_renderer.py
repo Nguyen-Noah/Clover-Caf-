@@ -46,6 +46,11 @@ class SpriteRenderer(Component):
             self.color = new_color
             self.dirty = True
 
+    def editor_update(self, dt):
+        if not self.last_transform.equals(self.entity.transform):
+            self.entity.transform.copy(self.last_transform)
+            self.dirty = True
+
     def update(self, dt):
         # check if the transform has changed
         if not self.last_transform.equals(self.entity.transform):

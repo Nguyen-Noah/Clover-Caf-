@@ -2,7 +2,6 @@ import imgui
 
 from ..utils.elements import Element
 from ..components.transform import Transform
-from ..primitives.vec2 import vec2
 from ..components.component_deserializer import deserialize_component
 
 class Entity(Element):
@@ -16,6 +15,7 @@ class Entity(Element):
         self.uid = Entity.ID_COUNTER
         Entity.ID_COUNTER += 1
         self.do_serialization = True
+        self.alive = True
 
     def get_component(self, component_class):
         for component in self.components:
@@ -34,13 +34,14 @@ class Entity(Element):
         self.components.append(c)
         c.entity = self
 
-    def update(self, dt):
-        for component in self.components:
-            component.update(dt)
-
     def start(self):
         for component in self.components:
             component.start()
+
+    def destroy(self):
+        self.alive = False
+        for component in self.components:
+            component.destroy()
 
     def imgui(self):
         for component in self.components:
@@ -53,6 +54,18 @@ class Entity(Element):
 
     def set_no_serialize(self):
         self.do_serialization = False
+
+    def editor_update(self, dt):
+        for component in self.components:
+            component.editor_update(dt)
+
+        return self.alive
+
+    def update(self, dt):
+        for component in self.components:
+            component.update(dt)
+
+        return self.alive
 
     def serialize(self):
         return {

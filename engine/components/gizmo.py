@@ -90,9 +90,14 @@ class Gizmo(Component):
     def disable_snap(self):
         self.snap = False
 
-    def update(self, dt):
+    def editor_update(self, dt):
         if not self.using:
             return
+
+        if self.e['Input'].holding('shift'):
+            self.snap = True
+        else:
+            self.snap = False
 
         self.active_entity = self.e['ImGui'].properties_window.active_entity
         if self.active_entity:
@@ -121,3 +126,7 @@ class Gizmo(Component):
 
             self.x_axis_entity.transform.position += self.x_axis_offset
             self.y_axis_entity.transform.position += self.y_axis_offset
+
+    def update(self, dt):
+        if self.using:
+            self._set_inactive()

@@ -1,5 +1,4 @@
 from .component import Component
-from ..utils.elements import Element
 from ..utils.settings import Settings
 from ..primitives import vec2, vec3
 
@@ -7,7 +6,7 @@ class GridLines(Component):
     def __init__(self):
         super().__init__()
 
-    def update(self, dt):
+    def editor_update(self, dt):
         camera_pos = self.e['Camera'].position
         projection_size = self.e['Camera'].size
 

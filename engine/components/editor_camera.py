@@ -16,7 +16,7 @@ class EditorCamera(Component):
 
         self.listener = 'space'
 
-    def update(self, dt):
+    def editor_update(self, dt):
         if self.e['Input'].holding(self.listener) and self.drag_debounce > 0:
             self.click_origin = vec2(self.e['Input'].mouse.get_ortho_x(), self.e['Input'].mouse.get_ortho_y())
             self.drag_debounce -= dt

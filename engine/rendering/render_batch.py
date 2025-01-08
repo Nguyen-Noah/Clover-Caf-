@@ -74,6 +74,23 @@ class RenderBatch(Element):
         elements.append(offset + 2)
         elements.append(offset + 1)
 
+    def destroy_if_exists(self, entity):
+        sprite = entity.get_component(SpriteRenderer)
+
+        if sprite in self.sprites:
+            index = self.sprites.index(sprite)  # Get the index of the sprite
+            self.sprites.pop(index)  # Remove the sprite at the index
+            self.num_sprites -= 1
+
+            # Mark the remaining sprites after the removed one as dirty
+            for i in range(index, self.num_sprites):
+                self.sprites[i].dirty = True
+
+            return True
+
+        return False
+
+
     def add_sprite(self, sprite: SpriteRenderer):
         texture = sprite.get_texture()
 

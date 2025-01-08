@@ -13,7 +13,7 @@ class GizmoSystem(Component):
         self.entity.add_component(TranslateGizmo(self.gizmos.get_sprite(1)))
         self.entity.add_component(ScaleGizmo(self.gizmos.get_sprite(2)))
 
-    def update(self, dt):
+    def editor_update(self, dt):
         if self.using_gizmo == 0:
             self.entity.get_component(TranslateGizmo).set_using()
             self.entity.get_component(ScaleGizmo).set_not_using()

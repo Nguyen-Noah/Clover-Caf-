@@ -9,7 +9,7 @@ class TranslateGizmo(Gizmo):
         self.last_dx = 0
         self.last_dy = 0
 
-    def update(self, dt):
+    def editor_update(self, dt):
         if self.e['Input'].holding('shift'):
             self.snap = True
         else:
@@ -38,4 +38,4 @@ class TranslateGizmo(Gizmo):
                 if self.snap:
                     self.active_entity.transform.position.y = round(self.e['Mouse'].get_ortho_y(), 32)
 
-        super().update(dt)
+        super().editor_update(dt)

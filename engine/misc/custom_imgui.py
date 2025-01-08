@@ -1,9 +1,6 @@
 import imgui, pygame
 from imgui.integrations.pygame import PygameRenderer
 
-from ..observers.event_system import EventSystem
-from ..observers.events import EventType
-from ..observers.events.event import Event
 from ..utils.elements import ElementSingleton
 from ..editor.game_view_window import GameViewWindow
 from ..editor.properties_window import PropertiesWindow

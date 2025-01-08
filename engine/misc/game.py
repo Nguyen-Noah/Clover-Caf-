@@ -31,6 +31,6 @@ class Game(ElementSingleton, Observer):
             self.update()
 
     def quit(self):
-        self.current_scene.save_exit()
+        self.current_scene.save()
         pygame.quit()
         sys.exit()

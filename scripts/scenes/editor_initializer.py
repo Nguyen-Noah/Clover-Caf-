@@ -15,6 +15,10 @@ class EditorInitializer(SceneInitializer):
     def __init__(self):
         print('Creating test scene')
         super().__init__()
+        self.sprites = None
+        self.tiles = None
+        self.gizmos = None
+        self.editor_utils = None
 
     def init(self, scene: Scene):
         self.sprites = self.e['Assets'].get_spritesheet('veggies.png')
@@ -48,7 +52,6 @@ class EditorInitializer(SceneInitializer):
         imgui.begin('Level Editor Stuff')
         self.editor_utils.imgui()
         imgui.end()
-
 
         imgui.begin('Test window')
         window_pos = imgui.get_window_position()

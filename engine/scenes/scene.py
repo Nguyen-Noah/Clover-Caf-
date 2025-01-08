@@ -15,7 +15,6 @@ class Scene(Element):
         self.camera = None
         self.running = False
         self.entities = []
-        self.loaded = False
 
         self._scene_initializer = scene_initializer
 
@@ -28,6 +27,7 @@ class Scene(Element):
         for entity in self.entities:
             entity.start()
             self.renderer.add(entity)
+            # self.physics_shit.add(enity)
         self.running = True
 
     def add_entity_to_scene(self, entity):
@@ -35,6 +35,7 @@ class Scene(Element):
         if self.running:
             entity.start()
             self.renderer.add(entity)
+            # self.physics_shit.add(entity)
 
     def create_entity(self, name):
         entity = Entity(name)
@@ -52,14 +53,31 @@ class Scene(Element):
     def imgui(self):
         self._scene_initializer.imgui()
 
+    def editor_update(self, dt):
+        self.camera.adjust_projection()
+        for i, entity in enumerate(self.entities):
+            alive = entity.editor_update(dt)
+            if not alive:
+                self.renderer.destroy_entity(entity)
+                # this.physics2D.destroy(entity)             DO THIS ONCE YOU IMPLEMENT
+                self.entities.pop(i)
+
     def update(self, dt):
         self.camera.adjust_projection()
 
-        for entity in self.entities:
-            entity.update(dt)
+        for i, entity in enumerate(self.entities):
+            alive = entity.update(dt)
+            if not alive:
+                self.renderer.destroy_entity(entity)
+                #this.physics2D.destroy(entity)             DO THIS ONCE YOU IMPLEMENT
+                self.entities.pop(i)
 
     def render(self):
         self.renderer.render()
+
+    def destroy(self):
+        for entity in self.entities:
+            entity.destroy()
 
     # might want to add some safety checks here
     def load(self, path):
@@ -90,7 +108,7 @@ class Scene(Element):
             self.entities = []
             self.loaded = True
 
-    def save_exit(self):
+    def save(self):
         data = []
         for entity in self.entities:
             if entity.do_serialization:

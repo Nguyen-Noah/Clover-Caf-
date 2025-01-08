@@ -14,7 +14,7 @@ class MouseControls(Component):
     def place(self):
         self.holding_entity = None
 
-    def update(self, dt):
+    def editor_update(self, dt):
         # temporary
         if self.holding_entity is not None:
             position = self.holding_entity.transform.position
