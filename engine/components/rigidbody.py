@@ -2,6 +2,8 @@ from .component import Component
 from ..primitives.vec3 import vec3
 from ..primitives.vec4 import vec4
 
+# what is this for? delete if not needed
+
 class RigidBody(Component):
     def __init__(self):
         super().__init__()

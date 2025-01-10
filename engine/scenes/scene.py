@@ -1,5 +1,3 @@
-import imgui
-
 from engine.misc.camera import Camera
 from engine.components.component import Component
 from engine.ecs.entity import Entity
@@ -7,12 +5,14 @@ from engine.components.transform import Transform
 from engine.utils.elements import Element
 from engine.rendering.renderer import Renderer
 from engine.utils.io import write_json, read_json
+from engine.physics2d.physics2D import Physics2D
 
 class Scene(Element):
     def __init__(self, scene_initializer):
         super().__init__()
         self.renderer = Renderer()
         self.camera = None
+        self.physics2D = Physics2D()
         self.running = False
         self.entities = []
 
@@ -27,7 +27,7 @@ class Scene(Element):
         for entity in self.entities:
             entity.start()
             self.renderer.add(entity)
-            # self.physics_shit.add(enity)
+            self.physics2D.add(entity)
         self.running = True
 
     def add_entity_to_scene(self, entity):
@@ -35,7 +35,7 @@ class Scene(Element):
         if self.running:
             entity.start()
             self.renderer.add(entity)
-            # self.physics_shit.add(entity)
+            self.physics2D.add(entity)
 
     def create_entity(self, name):
         entity = Entity(name)
@@ -55,21 +55,23 @@ class Scene(Element):
 
     def editor_update(self, dt):
         self.camera.adjust_projection()
+
         for i, entity in enumerate(self.entities):
             alive = entity.editor_update(dt)
             if not alive:
                 self.renderer.destroy_entity(entity)
-                # this.physics2D.destroy(entity)             DO THIS ONCE YOU IMPLEMENT
+                self.physics2D.destroy(entity)
                 self.entities.pop(i)
 
     def update(self, dt):
         self.camera.adjust_projection()
+        self.physics2D.update(dt)
 
         for i, entity in enumerate(self.entities):
             alive = entity.update(dt)
             if not alive:
                 self.renderer.destroy_entity(entity)
-                #this.physics2D.destroy(entity)             DO THIS ONCE YOU IMPLEMENT
+                self.physics2D.destroy_entity(entity)
                 self.entities.pop(i)
 
     def render(self):
@@ -104,6 +106,7 @@ class Scene(Element):
 
             self.loaded = True
         except Exception as e:
+            print(e)
             print('Level not found, starting new level.')
             self.entities = []
             self.loaded = True

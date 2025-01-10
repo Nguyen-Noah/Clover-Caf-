@@ -1,5 +1,3 @@
-from ..primitives import vec2
-from ..primitives import vec4
 
 class Line2D:
     def __init__(self, fr, to, color, lifetime):

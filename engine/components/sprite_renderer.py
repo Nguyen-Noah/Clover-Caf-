@@ -5,9 +5,9 @@ from ..components.sprite import Sprite
 from ..primitives.vec4 import vec4
 
 class SpriteRenderer(Component):
-    def __init__(self, color=vec4(1, 1, 1, 1), sprite=None):
+    def __init__(self, color=None, sprite=None):
         super().__init__()
-        self.color = color
+        self.color = color if color is not None else vec4(1, 1, 1, 1)
         self.sprite = sprite
 
         self.last_transform = None
@@ -40,8 +40,8 @@ class SpriteRenderer(Component):
         self.dirty = True
 
     def set_color(self, new_color):
-        # if new_color.x == 1:
-        #      print(f'old {self.color}; new {new_color}; diff {self.color != new_color}')
+        #if new_color.x == 1:
+        #    print(f'old {self.color}; new {new_color}; diff {self.color != new_color}')
         if self.color != new_color:
             self.color = new_color
             self.dirty = True

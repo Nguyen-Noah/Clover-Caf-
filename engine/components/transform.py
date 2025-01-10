@@ -37,4 +37,4 @@ class Transform(Component):
     def deserialize(cls, data):
         position = vec2().deserialize(data["position"]) if "position" in data else vec2(0, 0)
         scale = vec2().deserialize(data["scale"]) if "scale" in data else vec2(0, 0)
-        return cls(position=position, scale=scale)
+        return cls(position=position, scale=scale, rotation=data.get('rotation'), z_index=data.get('z_index'))

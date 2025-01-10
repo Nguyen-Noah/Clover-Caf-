@@ -14,7 +14,7 @@ class EditorCamera(Component):
         self.reset = False
         self.lerp_time = 0
 
-        self.listener = 'space'
+        self.listener = 'middle_click'
 
     def editor_update(self, dt):
         if self.e['Input'].holding(self.listener) and self.drag_debounce > 0:

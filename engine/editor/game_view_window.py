@@ -10,20 +10,7 @@ class GameViewWindow:
 
     @staticmethod
     def imgui(e):
-        imgui.begin("Game Viewport", imgui.WINDOW_MENU_BAR | imgui.WINDOW_NO_SCROLLBAR | imgui.WINDOW_NO_SCROLL_WITH_MOUSE)
-
-        with imgui.begin_main_menu_bar():           # cant figure out why imgui.begin_menu_bar() doesnt work, so put it on main
-            is_playing = GameViewWindow.is_playing
-            clicked, _ = imgui.menu_item('Play', '', is_playing, not is_playing)
-            if clicked:
-                is_playing = True
-                EventSystem.notify(Event(EventType.GAME_ENGINE_START_PLAY))
-
-            clicked, _ = imgui.menu_item('Stop', '', not is_playing, is_playing)
-            if clicked:
-                is_playing = False
-                EventSystem.notify(Event(EventType.GAME_ENGINE_STOP_PLAY))
-            GameViewWindow.is_playing = is_playing
+        imgui.begin("Game Viewport", imgui.WINDOW_NO_SCROLLBAR | imgui.WINDOW_NO_SCROLL_WITH_MOUSE)
 
         window_size = GameViewWindow.get_largest_size_for_viewport(e)
         window_pos = GameViewWindow.get_centered_position_for_viewport(window_size)

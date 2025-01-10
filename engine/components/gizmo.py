@@ -61,10 +61,10 @@ class Gizmo(Component):
         mouse_pos = vec2(self.e['Mouse'].get_ortho_x(), self.e['Mouse'].get_ortho_y())
         if (self.x_axis_entity.transform.position.x >= mouse_pos.x >= self.x_axis_entity.transform.position.x - self.gizmo_height and
             self.x_axis_entity.transform.position.y <= mouse_pos.y <= self.x_axis_entity.transform.position.y + self.gizmo_width):
-            #self.x_axis_sprite.set_color(self.x_axis_color_hover)
+            self.x_axis_sprite.set_color(self.x_axis_color_hover)
             return True
 
-        #self.x_axis_sprite.set_color(self.x_axis_color)
+        self.x_axis_sprite.set_color(self.x_axis_color)
         return False
 
     def check_y_hover_state(self):

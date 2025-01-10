@@ -1,9 +1,10 @@
 import imgui, pygame
 from imgui.integrations.pygame import PygameRenderer
 
-from ..utils.elements import ElementSingleton
-from ..editor.game_view_window import GameViewWindow
-from ..editor.properties_window import PropertiesWindow
+from engine.utils.elements import ElementSingleton
+from engine.editor.game_view_window import GameViewWindow
+from engine.editor.properties_window import PropertiesWindow
+from engine.editor.menu_bar import MenuBar
 
 FONT_PATH = 'data/fonts'
 
@@ -21,6 +22,8 @@ class ImGui(ElementSingleton):
         self.load_font('LEMONMILK.otf', 20)
 
         self.properties_window = PropertiesWindow(picking_texture)
+
+        self.menu_bar = MenuBar()
 
     def process_event(self, event):
         self.renderer.process_event(event)  # Default PygameRenderer event handling
@@ -76,6 +79,7 @@ class ImGui(ElementSingleton):
         GameViewWindow.imgui(self.e)
         self.properties_window.update(dt, scene)
         self.properties_window.imgui()
+        self.menu_bar.imgui()
         imgui.end()
 
         imgui.render()
