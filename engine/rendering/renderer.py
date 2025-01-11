@@ -35,12 +35,12 @@ class Renderer(ElementSingleton):
             new_batch.add_sprite(sprite)
             self.batches.sort(key=lambda batch: batch.z_index)
 
-    def destroy_entity(self, entity):
+    def destroy_entity(self, entity, idx):
         if entity.get_component(SpriteRenderer) is None:
             return
 
         for batch in self.batches:
-            if batch.destroy_if_exists(entity):
+            if batch.destroy_if_exists(entity, idx):
                 return
 
 

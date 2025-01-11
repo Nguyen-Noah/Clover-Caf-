@@ -1,6 +1,7 @@
 from engine.components.gizmo import Gizmo
 from engine.components.sprite import Sprite
 from engine.utils.game_math import round
+from engine.utils.settings import Settings
 
 # IMPLEMENT SNAPPING
 class TranslateGizmo(Gizmo):
@@ -32,10 +33,10 @@ class TranslateGizmo(Gizmo):
             if self.x_active and not self.y_active:
                 self.active_entity.transform.position.x += dx
                 if self.snap:
-                    self.active_entity.transform.position.x = round(self.e['Mouse'].get_ortho_x(), 32)
+                    self.active_entity.transform.position.x = round(self.e['Mouse'].get_ortho_x(), Settings.GRID_WIDTH)
             elif self.y_active and not self.x_active:
                 self.active_entity.transform.position.y += dy
                 if self.snap:
-                    self.active_entity.transform.position.y = round(self.e['Mouse'].get_ortho_y(), 32)
+                    self.active_entity.transform.position.y = round(self.e['Mouse'].get_ortho_y(), Settings.GRID_HEIGHT)
 
         super().editor_update(dt)

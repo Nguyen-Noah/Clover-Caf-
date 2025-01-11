@@ -46,21 +46,17 @@ class PickingTexture(Element):
         self.e['Game'].ctx.screen.use()
 
     def read_pixel(self, x, y):
-        # Save current framebuffer binding
         prev_fbo = glGetIntegerv(GL_FRAMEBUFFER_BINDING)
 
-        # Bind ModernGL framebuffer to OpenGL directly
         glBindFramebuffer(GL_READ_FRAMEBUFFER, self.fbo.glo)
         glReadBuffer(GL_COLOR_ATTACHMENT0)
 
-        # Prepare a buffer to read the pixel
         pixels = np.zeros(3, dtype=np.float32)
 
-        # Read pixel data from the framebuffer
         glReadPixels(x, y, 1, 1, GL_RGB, GL_FLOAT, pixels)
 
-        # Restore previous framebuffer binding
         glBindFramebuffer(GL_READ_FRAMEBUFFER, prev_fbo)
 
-        # Return the first component of the pixel (e.g., object ID) minus 1
+        print(int(pixels[0]))
+
         return int(pixels[0])

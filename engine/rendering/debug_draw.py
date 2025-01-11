@@ -29,6 +29,9 @@ class DebugDraw(ElementSingleton):
             [(self.vbo, '3f 3f', 'aPos', 'aColor')]
         )
 
+    def reset_vertices(self):
+        self.vertices = np.zeros_like(self.vertices)
+
     def begin_frame(self):
         if not self.started:
             self.setup_buffers()
@@ -42,6 +45,7 @@ class DebugDraw(ElementSingleton):
             return
         
         index = 0
+        self.reset_vertices()       # eventually want to find a better place for this
         for line in self.lines:
             pos_from = line.get_from()
             pos_to = line.get_to()

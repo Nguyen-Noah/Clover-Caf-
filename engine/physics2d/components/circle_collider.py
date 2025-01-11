@@ -5,8 +5,6 @@ class CircleCollider(Collider):
         super().__init__()
         self.radius = radius
 
-        self.debug = True
-
     def debug_draw(self):
         self.e['DebugDraw'].add_circle(self.entity.transform.position, self.radius)
 

@@ -1,7 +1,4 @@
-from ..ecs.entity import Entity
-from ..components.transform import Transform
-from ..components.sprite_renderer import SpriteRenderer
-from ..primitives.vec2 import vec2
+from engine.components.sprite_renderer import SpriteRenderer
 
 class Prefabs:
     @staticmethod

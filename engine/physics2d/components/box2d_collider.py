@@ -7,8 +7,6 @@ class Box2DCollider(Collider):
         self.half_size = half_size if half_size is not None else vec2(1, 1)
         self.origin = origin if origin is not None else vec2()
 
-        self.debug = True
-
     def debug_draw(self):
         center = self.entity.transform.position + self.offset
         dimensions = self.half_size * 2

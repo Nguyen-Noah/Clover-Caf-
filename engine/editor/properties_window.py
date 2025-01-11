@@ -14,29 +14,29 @@ class PropertiesWindow(Element):
         self.debounce = 0.2
 
     def imgui(self):
-            if self.active_entity is not None:
-                imgui.begin('Properties')
+        if self.active_entity is not None:
+            imgui.begin('Properties')
 
-                if imgui.begin_popup_context_window('Component Adder', 2):
-                    if imgui.menu_item('Add Rigidbody')[0]:
-                        if self.active_entity.get_component(RigidBody2D) is None:
-                            self.active_entity.add_component(RigidBody2D())
-                            self.check_and_add_to_physics()
+            if imgui.begin_popup_context_window('Component Adder', 2):
+                if imgui.menu_item('Add Rigidbody')[0]:
+                    if self.active_entity.get_component(RigidBody2D) is None:
+                        self.active_entity.add_component(RigidBody2D())
+                        self.check_and_add_to_physics()
 
-                    if imgui.menu_item('Add Box Collider')[0]:
-                        if self.active_entity.get_component(Box2DCollider) is None and self.active_entity.get_component(CircleCollider) is None:
-                            self.active_entity.add_component(Box2DCollider())
-                            self.check_and_add_to_physics()
+                if imgui.menu_item('Add Box Collider')[0]:
+                    if self.active_entity.get_component(Box2DCollider) is None and self.active_entity.get_component(CircleCollider) is None:
+                        self.active_entity.add_component(Box2DCollider())
+                        self.check_and_add_to_physics()
 
-                    if imgui.menu_item('Add Circle Collider')[0]:
-                        if self.active_entity.get_component(CircleCollider) is None and self.active_entity.get_component(Box2DCollider) is None:
-                            self.active_entity.add_component(CircleCollider())
-                            self.check_and_add_to_physics()
+                if imgui.menu_item('Add Circle Collider')[0]:
+                    if self.active_entity.get_component(CircleCollider) is None and self.active_entity.get_component(Box2DCollider) is None:
+                        self.active_entity.add_component(CircleCollider())
+                        self.check_and_add_to_physics()
 
-                    imgui.end_popup()
+                imgui.end_popup()
 
-                self.active_entity.imgui()
-                imgui.end()
+            self.active_entity.imgui()
+            imgui.end()
 
     def check_and_add_to_physics(self):
             if self.active_entity is not None:

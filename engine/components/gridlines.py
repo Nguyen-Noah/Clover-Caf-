@@ -8,7 +8,7 @@ class GridLines(Component):
 
     def editor_update(self, dt):
         camera_pos = self.e['Camera'].position
-        projection_size = self.e['Camera'].size
+        projection_size = self.e['Camera'].projection_size
 
         first_x = ((camera_pos.x // Settings.GRID_WIDTH) - 1) * Settings.GRID_WIDTH
         first_y = ((camera_pos.y // Settings.GRID_HEIGHT) - 1) * Settings.GRID_HEIGHT

@@ -1,5 +1,6 @@
 import numpy as np
 import moderngl, glm, math
+
 from engine.utils.elements import Element
 from engine.components.sprite_renderer import SpriteRenderer
 
@@ -74,18 +75,21 @@ class RenderBatch(Element):
         elements.append(offset + 2)
         elements.append(offset + 1)
 
-    def destroy_if_exists(self, entity):
+    def destroy_if_exists(self, entity, idx):
         sprite = entity.get_component(SpriteRenderer)
 
         if sprite in self.sprites:
-            index = self.sprites.index(sprite)  # Get the index of the sprite
-            self.sprites.pop(index)  # Remove the sprite at the index
+            index = self.sprites.index(sprite)
+            offset = index * 4 * self.VERTEX_SIZE
+
+            # Zero out the vertices for this sprite
+            self.vertices[offset:offset + 4 * self.VERTEX_SIZE] = 0
+
+            self.sprites[index] = None
             self.num_sprites -= 1
 
-            # Mark the remaining sprites after the removed one as dirty
-            for i in range(index, self.num_sprites):
-                self.sprites[i].dirty = True
-
+            # Write updated vertices to VBO
+            self.vbo.write(self.vertices.tobytes())
             return True
 
         return False
@@ -118,7 +122,7 @@ class RenderBatch(Element):
         return self.has_room and (self.texture_size is None or (texture and self.texture_size == texture.size))
 
     def load_vertex_properties(self, index):
-        sprite = self.sprites[index]
+        sprite: SpriteRenderer = self.sprites[index]
 
         color = sprite.color
         tex_coords = sprite.get_tex_coords()
@@ -148,15 +152,15 @@ class RenderBatch(Element):
                                                   1.0))
 
         # Add vertices with the appropriate properties
-        x_add = 1.0
-        y_add = 1.0
+        x_add = 0.5
+        y_add = 0.5
         for i in range(4):
             if i == 1:
-                y_add = 0.0
+                y_add = -0.5
             elif i == 2:
-                x_add = 0.0
+                x_add = -0.5
             elif i == 3:
-                y_add = 1.0
+                y_add = 0.5
 
             tr = sprite.entity.transform
 
@@ -213,11 +217,15 @@ class RenderBatch(Element):
         for i in range(self.num_sprites):
             if self.sprites[i] is None:
                 break
-            spr = self.sprites[i]
+            spr: SpriteRenderer = self.sprites[i]
             if spr.is_dirty():
                 self.load_vertex_properties(i)
                 spr.clean()
                 rebuffer_data = True
+
+            if spr.entity.transform.z_index is not self.z_index:
+                self.destroy_if_exists(spr.entity, i)
+                self.e['Renderer'].add(spr.entity)
 
         if rebuffer_data:
             self.vbo.write(self.vertices.tobytes())

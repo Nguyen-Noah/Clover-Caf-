@@ -1,3 +1,3 @@
 class Settings:
-    GRID_WIDTH = 32
-    GRID_HEIGHT = 32
+    GRID_WIDTH = 0.25#32
+    GRID_HEIGHT = 0.25#32

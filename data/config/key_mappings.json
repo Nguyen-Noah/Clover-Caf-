@@ -2,7 +2,7 @@
     "pause": ["button", 27],
     "up": ["button", 119], 
     "down": ["button", 115], 
-    "right": ["button", 100], 
+    "d": ["button", 100],
     "left": ["button", 97],
     "e": ["button", 101],
     "r": ["button", 114],
@@ -18,5 +18,7 @@
     "recenter": ["button", 46],
     "shift": ["button", 1073742049],
     "z": ["button", 109],
-    "q": ["button", 113]
+    "q": ["button", 113],
+    "ctrl": ["button", 1073742048],
+    "backspace": ["button", 8]
 }

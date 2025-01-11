@@ -10,7 +10,7 @@ class Physics2D(Element):
     def __init__(self, is_playing=True):
         super().__init__()
         self.is_playing = is_playing
-        self.gravity = Vec2d(0, -900)
+        self.gravity = Vec2d(0, -10)
         self.space = pymunk.Space()
         self.space.gravity = self.gravity
         self.physics_time = 0.0
@@ -21,7 +21,7 @@ class Physics2D(Element):
         if rb is not None and rb.raw_body is None:
             transform = entity.transform
 
-            pymunk_body_type = rb.body_type
+            pymunk_body_type = rb.body_type.value
 
             body = pymunk.Body(rb.mass, pymunk.moment_for_box(rb.mass, (50, 50)), pymunk_body_type)
             body.position = Vec2d(transform.position.x, transform.position.y)

@@ -82,11 +82,11 @@ class Mouse(ElementSingleton):
         curr_x = self.pos.x - self.game_viewport_pos.x
         curr_x = (curr_x / self.game_viewport_size.x) * 2 - 1
         tmp = glm.vec4(curr_x, 0, 0, 1)
-        tmp *= self.e['Game'].current_scene.camera.inverse_view
-        tmp *= self.e['Game'].current_scene.camera.inverse_projection
+        tmp = (self.e['Game'].current_scene.camera.inverse_view *
+               self.e['Game'].current_scene.camera.inverse_projection * tmp)
 
         self.last_world_x = self.world_x
-        self.world_x = tmp.x + (self.resolution[0] // 2)
+        self.world_x = tmp.x
         self.dirty_x = False
 
     def get_ortho_y(self):
@@ -98,11 +98,11 @@ class Mouse(ElementSingleton):
         curr_y = self.pos.y - self.game_viewport_pos.y
         curr_y = -((curr_y / self.game_viewport_size.y) * 2 - 1)
         tmp = glm.vec4(0, curr_y, 0, 1)
-        tmp *= self.e['Game'].current_scene.camera.inverse_view
-        tmp *= self.e['Game'].current_scene.camera.inverse_projection
+        tmp = (self.e['Game'].current_scene.camera.inverse_view *
+               self.e['Game'].current_scene.camera.inverse_projection * tmp)
 
         self.last_world_y = self.world_y
-        self.world_y = tmp.y + (self.resolution[1] // 2)
+        self.world_y = tmp.y
         self.dirty_y = False
 
     def is_dragging(self, button='left_click'):
@@ -154,6 +154,7 @@ class Input(ElementSingleton):
             '=': '+',
         }
         self.shift = False
+        self.ctrl = False
 
         self.mouse = Mouse(resolution)
 
@@ -235,6 +236,8 @@ class Input(ElementSingleton):
                 else:
                     if event.key in [pygame.K_LSHIFT, pygame.K_RSHIFT]:
                         self.shift = True
+                    if event.key in [pygame.K_LCTRL, pygame.K_RCTRL]:
+                        self.ctrl = True
                     if self.text_buffer:
                         for char in self.valid_chars:
                             new_char = None
@@ -267,6 +270,9 @@ class Input(ElementSingleton):
                 
                 if event.key in [pygame.K_LSHIFT, pygame.K_RSHIFT]:
                     self.shift = False
+
+                if event.key in [pygame.K_LCTRL, pygame.K_RCTRL]:
+                    self.ctrl = False
 
         if self.text_buffer:
             if self.pressed('__backspace'):

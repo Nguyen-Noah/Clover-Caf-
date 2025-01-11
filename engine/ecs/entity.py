@@ -67,6 +67,9 @@ class Entity(Element):
 
         return self.alive
 
+    def copy(self):
+        return Entity.deserialize(self.serialize())
+
     def serialize(self):
         return {
             "uid": self.uid,

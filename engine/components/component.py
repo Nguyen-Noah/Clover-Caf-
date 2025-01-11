@@ -1,5 +1,6 @@
 import imgui
 
+from enum import Enum
 from engine.editor.pimgui import PImGui
 from engine.utils.elements import Element
 from engine.primitives import vec2, vec3, vec4
@@ -62,6 +63,15 @@ class Component(Element):
                     changed, im_val = imgui.checkbox(f"{name}", value)
                     if changed:
                         setattr(self, field_name, im_val)
+
+                elif issubclass(field_type, Enum):
+                    enum_map = {e.name.capitalize(): e for e in field_type}
+                    enum_names = list(enum_map.keys())
+                    current_index = enum_names.index(value.name.capitalize())
+
+                    changed, new_index = imgui.combo(field_name, current_index, enum_names)
+                    if changed:
+                        setattr(self, field_name, enum_map[enum_names[new_index].upper()])
 
         except Exception as e:
             print(e)

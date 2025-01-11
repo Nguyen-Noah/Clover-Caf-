@@ -7,3 +7,4 @@ class Collider(Component):
         if offset is None:
             offset = vec2(0, 0)
         self.offset = offset
+        self.debug = True

@@ -1,3 +1,4 @@
+from engine.components.non_render import NonRender
 from engine.misc.camera import Camera
 from engine.components.component import Component
 from engine.ecs.entity import Entity
@@ -19,23 +20,25 @@ class Scene(Element):
         self._scene_initializer = scene_initializer
 
     def init(self):
-        self.camera = Camera(self.e['Game'].resolution)
+        self.camera = Camera((3, 2))#self.e['Game'].resolution
         self._scene_initializer.load_resources(self)
         self._scene_initializer.init(self)
 
     def start(self):
         for entity in self.entities:
             entity.start()
-            self.renderer.add(entity)
-            self.physics2D.add(entity)
+            if not entity.get_component(NonRender):
+                self.renderer.add(entity)
+                self.physics2D.add(entity)
         self.running = True
 
     def add_entity_to_scene(self, entity):
         self.entities.append(entity)
         if self.running:
             entity.start()
-            self.renderer.add(entity)
-            self.physics2D.add(entity)
+            if not entity.get_component(NonRender):
+                self.renderer.add(entity)
+                self.physics2D.add(entity)
 
     def create_entity(self, name):
         entity = Entity(name)
@@ -59,8 +62,8 @@ class Scene(Element):
         for i, entity in enumerate(self.entities):
             alive = entity.editor_update(dt)
             if not alive:
-                self.renderer.destroy_entity(entity)
-                self.physics2D.destroy(entity)
+                self.renderer.destroy_entity(entity, i)
+                self.physics2D.destroy_entity(entity)
                 self.entities.pop(i)
 
     def update(self, dt):
@@ -70,7 +73,7 @@ class Scene(Element):
         for i, entity in enumerate(self.entities):
             alive = entity.update(dt)
             if not alive:
-                self.renderer.destroy_entity(entity)
+                self.renderer.destroy_entity(entity, i)
                 self.physics2D.destroy_entity(entity)
                 self.entities.pop(i)
 

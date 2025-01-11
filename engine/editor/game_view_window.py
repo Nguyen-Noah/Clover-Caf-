@@ -1,8 +1,5 @@
 import imgui
 
-from engine.observers.event_system import EventSystem
-from engine.observers.events import EventType
-from engine.observers.events.event import Event
 from engine.primitives import vec2
 
 class GameViewWindow:

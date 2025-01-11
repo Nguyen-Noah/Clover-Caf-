@@ -2,7 +2,6 @@ from engine.components.component import Component
 from engine.components.non_pickable import NonPickable
 from engine.components.sprite_renderer import SpriteRenderer
 from engine.components.sprite import Sprite
-from engine.components.transform import Transform
 from engine.misc.prefabs import Prefabs
 from engine.primitives import vec2, vec4
 
@@ -19,22 +18,22 @@ class Gizmo(Component):
         self.y_axis_color = vec4(0.3, 1, 0.3, 0.5)
         self.y_axis_color_hover = vec4(0, 1, 0, 1)
 
-        self.x_axis_entity = Prefabs.generate_sprite_object(self.e, arrow_sprite, 16, 48)
-        self.y_axis_entity = Prefabs.generate_sprite_object(self.e, arrow_sprite, 16, 48)
+        self.gizmo_width = 16 / 80
+        self.gizmo_height = 48 / 80
+
+        self.x_axis_entity = Prefabs.generate_sprite_object(self.e, arrow_sprite, self.gizmo_width, self.gizmo_height)
+        self.y_axis_entity = Prefabs.generate_sprite_object(self.e, arrow_sprite, self.gizmo_width, self.gizmo_height)
         self.x_axis_sprite: SpriteRenderer = self.x_axis_entity.get_component(SpriteRenderer)
         self.y_axis_sprite: SpriteRenderer = self.y_axis_entity.get_component(SpriteRenderer)
 
         self.x_axis_entity.add_component(NonPickable())
         self.y_axis_entity.add_component(NonPickable())
 
-        self.x_axis_offset = vec2(56, -2)
-        self.y_axis_offset = vec2(12, 56)
+        self.x_axis_offset = vec2(24 / 80, -6 / 80)
+        self.y_axis_offset = vec2(-7 / 80, 21 / 80)
 
         self.e['Game'].current_scene.add_entity_to_scene(self.x_axis_entity)
         self.e['Game'].current_scene.add_entity_to_scene(self.y_axis_entity)
-
-        self.gizmo_width = 16
-        self.gizmo_height = 48
 
         self.active_entity = None
         self.using = False
@@ -59,8 +58,8 @@ class Gizmo(Component):
 
     def check_x_hover_state(self):
         mouse_pos = vec2(self.e['Mouse'].get_ortho_x(), self.e['Mouse'].get_ortho_y())
-        if (self.x_axis_entity.transform.position.x >= mouse_pos.x >= self.x_axis_entity.transform.position.x - self.gizmo_height and
-            self.x_axis_entity.transform.position.y <= mouse_pos.y <= self.x_axis_entity.transform.position.y + self.gizmo_width):
+        if (self.x_axis_entity.transform.position.x + (self.gizmo_height / 2) >= mouse_pos.x >= self.x_axis_entity.transform.position.x - (self.gizmo_height / 2) and
+            self.x_axis_entity.transform.position.y - (self.gizmo_width / 2) <= mouse_pos.y <= self.x_axis_entity.transform.position.y + (self.gizmo_width / 2)):
             self.x_axis_sprite.set_color(self.x_axis_color_hover)
             return True
 
@@ -69,12 +68,12 @@ class Gizmo(Component):
 
     def check_y_hover_state(self):
         mouse_pos = vec2(self.e['Mouse'].get_ortho_x(), self.e['Mouse'].get_ortho_y())
-        if (self.y_axis_entity.transform.position.x >= mouse_pos.x >= self.y_axis_entity.transform.position.x - self.gizmo_width and
-            self.y_axis_entity.transform.position.y >= mouse_pos.y >= self.y_axis_entity.transform.position.y - self.gizmo_height):
-            #self.y_axis_sprite.set_color(self.y_axis_color_hover)
+        if (self.y_axis_entity.transform.position.x + (self.gizmo_width / 2) >= mouse_pos.x >= self.y_axis_entity.transform.position.x - (self.gizmo_width / 2) and
+            self.y_axis_entity.transform.position.y + (self.gizmo_height / 2) >= mouse_pos.y >= self.y_axis_entity.transform.position.y - (self.gizmo_height / 2)):
+            self.y_axis_sprite.set_color(self.y_axis_color_hover)
             return True
 
-        #self.y_axis_sprite.set_color(self.y_axis_color)
+        self.y_axis_sprite.set_color(self.y_axis_color)
         return False
 
     def set_using(self):
@@ -102,6 +101,17 @@ class Gizmo(Component):
         self.active_entity = self.e['ImGui'].properties_window.active_entity
         if self.active_entity:
             self._set_active()
+            if self.e['Input'].pressed('d'):
+                new_entity = self.active_entity.copy()
+                self.e['Game'].current_scene.add_entity_to_scene(new_entity)
+                new_entity.transform.position += vec2(0.1, 0.1)
+                self.e['ImGui'].properties_window.active_entity = new_entity
+                return
+            elif self.e['Input'].pressed('backspace'):
+                self.active_entity.destroy()
+                self._set_inactive()
+                self.e['ImGui'].properties_window.active_entity = None
+                return
         else:
             self._set_inactive()
             return

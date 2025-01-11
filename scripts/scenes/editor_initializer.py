@@ -1,6 +1,7 @@
 import imgui
 
 from engine.components.gizmo_system import GizmoSystem
+from engine.components.non_pickable import NonPickable
 from engine.components.spritesheet import Spritesheet
 from engine.misc.prefabs import Prefabs
 from engine.components.gridlines import GridLines
@@ -9,7 +10,6 @@ from engine.components.editor_camera import EditorCamera
 from engine.components.mouse_controls import MouseControls
 from engine.scenes.scene import Scene
 from engine.scenes.scene_initializer import SceneInitializer
-
 
 class EditorInitializer(SceneInitializer):
     def __init__(self):
@@ -32,7 +32,9 @@ class EditorInitializer(SceneInitializer):
         self.editor_utils.add_component(MouseControls())
         self.editor_utils.add_component(GridLines())
         self.editor_utils.add_component(EditorCamera(scene.camera))
-        self.editor_utils.add_component(GizmoSystem(self.gizmos))
+        if not self.e['Game'].runtime_playing:
+            self.editor_utils.add_component(GizmoSystem(self.gizmos))
+            self.editor_utils.add_component(NonPickable())
         scene.add_entity_to_scene(self.editor_utils)
 
     def load_resources(self, scene: Scene):
@@ -71,7 +73,7 @@ class EditorInitializer(SceneInitializer):
             if imgui.image_button(tex_id, sprite_width, sprite_height, 
                                   (tex_coords[2].x, tex_coords[0].y),
                                   (tex_coords[0].x, tex_coords[2].y)):
-                entity = Prefabs.generate_sprite_object(self.e, sprite, 32, 32)
+                entity = Prefabs.generate_sprite_object(self.e, sprite, 0.25, 0.25)
                 self.editor_utils.get_component(MouseControls).pickup_entity(entity)
             imgui.pop_id()
 
