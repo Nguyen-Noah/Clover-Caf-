@@ -1,5 +1,7 @@
+from engine.components.component_deserializer import register_component
 from engine.physics2d.components.collider import Collider
 
+@register_component
 class CircleCollider(Collider):
     def __init__(self, radius=1):
         super().__init__()

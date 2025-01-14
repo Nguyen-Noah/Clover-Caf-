@@ -71,7 +71,7 @@ class Component(Element):
 
                     changed, new_index = imgui.combo(field_name, current_index, enum_names)
                     if changed:
-                        setattr(self, field_name, enum_map[enum_names[new_index].upper()])
+                        setattr(self, field_name, enum_map[enum_names[new_index]])
 
         except Exception as e:
             print(e)

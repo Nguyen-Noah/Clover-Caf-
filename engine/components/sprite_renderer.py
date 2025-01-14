@@ -1,9 +1,11 @@
 import imgui
 from .component import Component
+from .component_deserializer import register_component
 from ..components.transform import Transform
 from ..components.sprite import Sprite
 from ..primitives.vec4 import vec4
 
+@register_component
 class SpriteRenderer(Component):
     def __init__(self, color=None, sprite=None):
         super().__init__()

@@ -9,7 +9,7 @@ class Renderer(ElementSingleton):
         self.current_shader = ('vsDefault.glsl', 'default.glsl')
         self.rebind_shader = False
 
-        self.max_batch_size = 1000
+        self.max_batch_size = 5
         self.batches = []
 
     def add(self, entity):
@@ -35,12 +35,12 @@ class Renderer(ElementSingleton):
             new_batch.add_sprite(sprite)
             self.batches.sort(key=lambda batch: batch.z_index)
 
-    def destroy_entity(self, entity, idx):
+    def destroy_entity(self, entity):
         if entity.get_component(SpriteRenderer) is None:
             return
 
         for batch in self.batches:
-            if batch.destroy_if_exists(entity, idx):
+            if batch.destroy_if_exists(entity):
                 return
 
 
@@ -48,5 +48,7 @@ class Renderer(ElementSingleton):
         self.current_shader = self.e['Assets'].get_shader(*shader)
 
     def render(self):
+        f = 0
         for batch in self.batches:
-            batch.render()
+            batch.render(f)
+            f += 1

@@ -84,3 +84,26 @@ class PImGui:
         imgui.pop_id()
 
         return c, val
+
+    @staticmethod
+    def input_text(label, text, column_width=default_column_width):
+        imgui.push_id(label)
+
+        imgui.columns(2)
+        imgui.set_column_width(0, column_width)
+        imgui.text(label)
+        imgui.next_column()
+
+        out_str = text
+        changed, out_str = imgui.input_text('##' + label, out_str, 400)
+        if changed:
+            imgui.columns(1)
+            imgui.pop_id()
+
+            print(out_str)
+            return out_str
+
+        imgui.columns(1)
+        imgui.pop_id()
+
+        return text

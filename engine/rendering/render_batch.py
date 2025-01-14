@@ -1,8 +1,11 @@
+import sys
 import numpy as np
 import moderngl, glm, math
 
 from engine.utils.elements import Element
 from engine.components.sprite_renderer import SpriteRenderer
+
+np.set_printoptions(threshold=sys.maxsize)
 
 SHADER_PATH = 'engine/rendering/shaders'
 
@@ -75,25 +78,33 @@ class RenderBatch(Element):
         elements.append(offset + 2)
         elements.append(offset + 1)
 
-    def destroy_if_exists(self, entity, idx):
+    def destroy_if_exists(self, entity):
         sprite = entity.get_component(SpriteRenderer)
 
-        if sprite in self.sprites:
-            index = self.sprites.index(sprite)
-            offset = index * 4 * self.VERTEX_SIZE
+        # for i, s in enumerate(self.sprites):
+        #     if s == sprite:
+        #         self.sprites.pop(i)
+        #         for s in self.sprites[i:]:
+        #             if s is not None:
+        #                 s.dirty = True
+        #         self.num_sprites -= 1
+        #         return True
+        #
+        # return False
 
-            # Zero out the vertices for this sprite
-            self.vertices[offset:offset + 4 * self.VERTEX_SIZE] = 0
-
-            self.sprites[index] = None
-            self.num_sprites -= 1
-
-            # Write updated vertices to VBO
-            self.vbo.write(self.vertices.tobytes())
-            return True
-
-        return False
-
+        #print('before')
+        #print(self.sprites)
+        for i in range(self.num_sprites):
+            if self.sprites[i] == sprite:
+                print('found')
+                for j in range(i, self.num_sprites - 1):
+                    self.sprites[j] = self.sprites[j + 1]
+                    self.sprites[j].dirty = True
+                self.num_sprites -= 1
+                #print('after')
+                #print(self.sprites)
+                return True
+            return False
 
     def add_sprite(self, sprite: SpriteRenderer):
         texture = sprite.get_texture()
@@ -162,8 +173,6 @@ class RenderBatch(Element):
             elif i == 3:
                 y_add = 0.5
 
-            tr = sprite.entity.transform
-
             current_pos = glm.vec4(
                 sprite.entity.transform.position.x + (x_add * sprite.entity.transform.scale.x),
                 sprite.entity.transform.position.y + (y_add * sprite.entity.transform.scale.y),
@@ -212,7 +221,7 @@ class RenderBatch(Element):
     def has_texture(self, tex):
         return tex in self.textures
 
-    def render(self):
+    def render(self, f):
         rebuffer_data = False
         for i in range(self.num_sprites):
             if self.sprites[i] is None:
@@ -224,7 +233,7 @@ class RenderBatch(Element):
                 rebuffer_data = True
 
             if spr.entity.transform.z_index is not self.z_index:
-                self.destroy_if_exists(spr.entity, i)
+                self.destroy_if_exists(spr.entity)
                 self.e['Renderer'].add(spr.entity)
 
         if rebuffer_data:
@@ -242,3 +251,4 @@ class RenderBatch(Element):
             'uView': self.e['Camera'].get_view_matrix(),
             'uTextures': self.texture_array
         })
+        #print(self.vertices)

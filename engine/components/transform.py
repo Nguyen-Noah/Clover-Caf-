@@ -1,6 +1,9 @@
 from .component import Component
+from .component_deserializer import register_component
+from ..editor.pimgui import PImGui
 from ..primitives.vec2 import vec2
 
+@register_component
 class Transform(Component):
     def __init__(self, position=None, scale=None, rotation=0.0, z_index=0):
         super().__init__()
@@ -9,10 +12,16 @@ class Transform(Component):
         self.rotation = rotation
         self.z_index = z_index
 
+    def imgui(self):
+        self.entity.name = PImGui.input_text('Name: ', self.entity.name)
+        super().imgui()
+
     def copy(self, to=None):
         if to:
             to.position = self.position.copy()
             to.scale = self.scale.copy()
+            to.rotation = self.rotation * 1
+            to.z_index = self.z_index * 1
         else:
             return Transform(self.position.copy(), self.scale.copy())
 

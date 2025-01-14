@@ -1,11 +1,11 @@
 import math
 
-import pymunk
-
 from engine.components.component import Component
+from engine.components.component_deserializer import register_component
 from engine.physics2d.enums import BodyType
 from engine.primitives import vec2
 
+@register_component
 class RigidBody2D(Component):
     def __init__(self, body_type=BodyType.DYNAMIC, mass=1.0, friction=0.5, elasticity=0.5):
         super().__init__()

@@ -34,4 +34,14 @@ class Texture(Element):
     def deserialize(cls, data):
         texture = cls(data['path'])
         return texture
-    
+
+    def __eq__(self, other):
+        if not isinstance(other, Texture):
+            return False
+        return (self.path == other.path and
+                self.width == other.width and
+                self.height == other.height)
+
+    def __hash__(self):
+        # Allow instances to be used in sets or as dict keys
+        return hash((self.path, self.width, self.height))

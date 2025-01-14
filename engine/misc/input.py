@@ -61,49 +61,53 @@ class Mouse(ElementSingleton):
     def get_scroll_y(self):
         return self.scroll_y
 
-    def get_screen_x(self):
-        curr_x = self.pos.x - self.game_viewport_pos.x
-        curr_x = (curr_x / self.game_viewport_size.x) * self.resolution[0]
+    def in_viewport_boundary(self):
+        return (0 <= self.get_screen_x() <= self.resolution[0]) and (0 <= self.get_screen_y() <= self.resolution[1])
 
-        return curr_x
+    def get_screen_x(self):
+        return self.get_screen().x
 
     def get_screen_y(self):
-        curr_y = self.pos.y - self.game_viewport_pos.y
-        curr_y = self.resolution[1] - ((curr_y / self.game_viewport_size.y) * self.resolution[1])
+        return self.get_screen().y
 
-        return curr_y
+    def get_screen(self) -> vec2:
+        try:
+            curr_x = self.pos.x - self.game_viewport_pos.x
+            curr_x = (curr_x / self.game_viewport_size.x) * self.resolution[0]
+            curr_y = self.pos.y - self.game_viewport_pos.y
+            curr_y = self.resolution[1] - ((curr_y / self.game_viewport_size.y) * self.resolution[1])
 
-    def get_ortho_x(self):
-        if self.dirty_x:
-            self.calc_ortho_x()
-        return self.world_x
+            return vec2(curr_x, curr_y)
+        except ZeroDivisionError:
+            return vec2()
+        except ValueError as e:
+            return vec2()
 
-    def calc_ortho_x(self):
-        curr_x = self.pos.x - self.game_viewport_pos.x
-        curr_x = (curr_x / self.game_viewport_size.x) * 2 - 1
-        tmp = glm.vec4(curr_x, 0, 0, 1)
-        tmp = (self.e['Game'].current_scene.camera.inverse_view *
-               self.e['Game'].current_scene.camera.inverse_projection * tmp)
+    def get_world_x(self) -> float:
+        return self.get_world().x
 
-        self.last_world_x = self.world_x
-        self.world_x = tmp.x
-        self.dirty_x = False
+    def get_world_y(self) -> float:
+        return self.get_world().y
 
-    def get_ortho_y(self):
-        if self.dirty_y:
-            self.calc_ortho_y()
-        return self.world_y
+    def get_world(self) -> vec2:
+        if self.dirty_x or self.dirty_y:
+            curr_x = self.pos.x - self.game_viewport_pos.x
+            curr_x = (curr_x / self.game_viewport_size.x) * 2 - 1
+            curr_y = self.pos.y - self.game_viewport_pos.y
+            curr_y = -((curr_y / self.game_viewport_size.y) * 2 - 1)
+            tmp = glm.vec4(curr_x, curr_y, 0, 1)
 
-    def calc_ortho_y(self):
-        curr_y = self.pos.y - self.game_viewport_pos.y
-        curr_y = -((curr_y / self.game_viewport_size.y) * 2 - 1)
-        tmp = glm.vec4(0, curr_y, 0, 1)
-        tmp = (self.e['Game'].current_scene.camera.inverse_view *
-               self.e['Game'].current_scene.camera.inverse_projection * tmp)
+            tmp = (self.e['Game'].current_scene.camera.inverse_view *
+                   self.e['Game'].current_scene.camera.inverse_projection * tmp)
 
-        self.last_world_y = self.world_y
-        self.world_y = tmp.y
-        self.dirty_y = False
+            self.last_world_x = self.world_x
+            self.last_world_y = self.world_y
+            self.world_x = tmp.x
+            self.world_y = tmp.y
+            self.dirty_x = False
+            self.dirty_y = False
+
+        return vec2(self.world_x, self.world_y)
 
     def is_dragging(self, button='left_click'):
         return self.e['Input'].holding(button) and self.moved
@@ -192,12 +196,13 @@ class Input(ElementSingleton):
             state.update()
 
         self.mouse.reset()
-        self.e['Mouse'].update()
+        self.mouse.update()
 
         for event in pygame.event.get():
 
             try:
-                self.e['ImGui'].process_event(event)
+                if not self.mouse.in_viewport_boundary():
+                    self.e['ImGui'].process_event(event)
             except Exception as e:
                 pass
 

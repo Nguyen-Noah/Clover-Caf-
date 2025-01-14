@@ -23,8 +23,8 @@ class GameViewWindow:
         tex_id = e['Game'].fbo.get_id()
         imgui.image(texture_id=tex_id, width=window_size.x, height=window_size.y, uv0=(0, 1), uv1=(1, 0))
 
-        e['Input'].mouse.game_viewport_pos = vec2(*tl)
-        e['Input'].mouse.game_viewport_size = vec2(*window_size)
+        e['Mouse'].game_viewport_pos = vec2(*tl)
+        e['Mouse'].game_viewport_size = vec2(*window_size)
 
         imgui.end()
 

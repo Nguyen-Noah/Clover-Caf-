@@ -1,6 +1,8 @@
+from engine.components.component_deserializer import register_component
 from engine.physics2d.components.collider import Collider
 from engine.primitives import vec2, vec3
 
+@register_component
 class Box2DCollider(Collider):
     def __init__(self, half_size=None, origin=None, offset=None):
         super().__init__(offset)

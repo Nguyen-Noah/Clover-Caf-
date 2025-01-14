@@ -1,6 +1,7 @@
 import imgui, pygame
 from imgui.integrations.pygame import PygameRenderer
 
+from engine.editor.scene_hierarchy_window import SceneHierarchyWindow
 from engine.utils.elements import ElementSingleton
 from engine.editor.game_view_window import GameViewWindow
 from engine.editor.properties_window import PropertiesWindow
@@ -22,6 +23,7 @@ class ImGui(ElementSingleton):
         self.load_font('LEMONMILK.otf', 20)
 
         self.properties_window = PropertiesWindow(picking_texture)
+        self.scene_hierarchy_window = SceneHierarchyWindow()
 
         self.menu_bar = MenuBar()
 
@@ -75,11 +77,17 @@ class ImGui(ElementSingleton):
         self.start_frame()
         self.setup_dock_space()
         scene.imgui()
-        imgui.show_test_window()
+
+        #imgui.show_test_window()
         GameViewWindow.imgui(self.e)
+
         self.properties_window.update(dt, scene)
         self.properties_window.imgui()
+
+        self.scene_hierarchy_window.imgui()
+
         self.menu_bar.imgui()
+
         imgui.end()
 
         imgui.render()

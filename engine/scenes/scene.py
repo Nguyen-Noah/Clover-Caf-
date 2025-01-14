@@ -1,4 +1,5 @@
 from engine.components.non_render import NonRender
+from engine.components.sprite_renderer import SpriteRenderer
 from engine.misc.camera import Camera
 from engine.components.component import Component
 from engine.ecs.entity import Entity
@@ -62,7 +63,7 @@ class Scene(Element):
         for i, entity in enumerate(self.entities):
             alive = entity.editor_update(dt)
             if not alive:
-                self.renderer.destroy_entity(entity, i)
+                self.renderer.destroy_entity(entity)
                 self.physics2D.destroy_entity(entity)
                 self.entities.pop(i)
 
@@ -73,7 +74,7 @@ class Scene(Element):
         for i, entity in enumerate(self.entities):
             alive = entity.update(dt)
             if not alive:
-                self.renderer.destroy_entity(entity, i)
+                self.renderer.destroy_entity(entity)
                 self.physics2D.destroy_entity(entity)
                 self.entities.pop(i)
 

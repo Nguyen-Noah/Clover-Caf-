@@ -57,6 +57,4 @@ class PickingTexture(Element):
 
         glBindFramebuffer(GL_READ_FRAMEBUFFER, prev_fbo)
 
-        print(int(pixels[0]))
-
         return int(pixels[0])

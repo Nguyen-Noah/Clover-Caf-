@@ -57,7 +57,7 @@ class Gizmo(Component):
         self.y_axis_entity.set_no_serialize()
 
     def check_x_hover_state(self):
-        mouse_pos = vec2(self.e['Mouse'].get_ortho_x(), self.e['Mouse'].get_ortho_y())
+        mouse_pos = self.e['Mouse'].get_world()
         if (self.x_axis_entity.transform.position.x + (self.gizmo_height / 2) >= mouse_pos.x >= self.x_axis_entity.transform.position.x - (self.gizmo_height / 2) and
             self.x_axis_entity.transform.position.y - (self.gizmo_width / 2) <= mouse_pos.y <= self.x_axis_entity.transform.position.y + (self.gizmo_width / 2)):
             self.x_axis_sprite.set_color(self.x_axis_color_hover)
@@ -67,7 +67,7 @@ class Gizmo(Component):
         return False
 
     def check_y_hover_state(self):
-        mouse_pos = vec2(self.e['Mouse'].get_ortho_x(), self.e['Mouse'].get_ortho_y())
+        mouse_pos = self.e['Mouse'].get_world()
         if (self.y_axis_entity.transform.position.x + (self.gizmo_width / 2) >= mouse_pos.x >= self.y_axis_entity.transform.position.x - (self.gizmo_width / 2) and
             self.y_axis_entity.transform.position.y + (self.gizmo_height / 2) >= mouse_pos.y >= self.y_axis_entity.transform.position.y - (self.gizmo_height / 2)):
             self.y_axis_sprite.set_color(self.y_axis_color_hover)
@@ -107,7 +107,7 @@ class Gizmo(Component):
                 new_entity.transform.position += vec2(0.1, 0.1)
                 self.e['ImGui'].properties_window.active_entity = new_entity
                 return
-            elif self.e['Input'].pressed('backspace'):
+            elif self.e['Input'].pressed('backspace') and self.e['Mouse'].in_viewport_boundary():
                 self.active_entity.destroy()
                 self._set_inactive()
                 self.e['ImGui'].properties_window.active_entity = None
