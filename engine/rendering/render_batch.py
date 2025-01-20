@@ -10,6 +10,18 @@ np.set_printoptions(threshold=sys.maxsize)
 SHADER_PATH = 'engine/rendering/shaders'
 
 class RenderBatch(Element):
+    """A batch responsible for drawing multiple SpriteRenderers with the same textures/size."""
+
+    BATCH_INDEX = 0
+
+    # Vertex attribute sizes
+    POS_SIZE = 2
+    COLOR_SIZE = 4
+    TEX_COORDS_SIZE = 2
+    TEX_ID_SIZE = 1
+    ENTITY_ID_SIZE = 1
+    VERTEX_SIZE = POS_SIZE + COLOR_SIZE + TEX_COORDS_SIZE + TEX_ID_SIZE + ENTITY_ID_SIZE
+
     def __init__(self, z_index=0, max_batch_size=1000, texture_size=None):
         super().__init__()
         """
@@ -18,30 +30,32 @@ class RenderBatch(Element):
         Pos                 Color                           tex coords      tex id
         float, float,       float, float, float, float      float, float    float
         """
-        self.POS_SIZE = 2
-        self.COLOR_SIZE = 4
-        self.TEX_COORDS_SIZE = 2
-        self.TEX_ID_SIZE = 1
-        self.ENTITY_ID_SIZE = 1
-        self.VERTEX_SIZE = self.POS_SIZE + self.COLOR_SIZE + self.TEX_COORDS_SIZE + self.TEX_ID_SIZE + self.ENTITY_ID_SIZE
 
-        self.sprites = [None] * max_batch_size           # SpriteRenderer
+        # Batch info
+        self.MAX_BATCH_SIZE = max_batch_size
+        self.z_index = z_index
+        self.batch_index = RenderBatch.BATCH_INDEX
+        RenderBatch.BATCH_INDEX += 1
+
+        # Sprite storage
+        self.sprites = [None] * self.MAX_BATCH_SIZE           # SpriteRenderer
         self.num_sprites = 0
         self.has_room = True
+
+        # GPU data
+        self.vertices = np.zeros((self.MAX_BATCH_SIZE * 4 * RenderBatch.VERTEX_SIZE), dtype=np.float32)
         self.vao = None
-        self.picking_vao = None         # not the greatest approach, but it works
         self.vbo = None
+        self.picking_vao = None         # not the greatest approach, but it works
 
-        self.MAX_BATCH_SIZE = max_batch_size
+        # Shaders, textures
         self.shader = self.e['Assets'].get_shader('vsDefault.glsl', 'default.glsl')
-
-        self.vertices = np.zeros((self.MAX_BATCH_SIZE * 4 * self.VERTEX_SIZE), dtype=np.float32)
-
         self.textures = []
         self.texture_array = None
-
-        self.z_index = z_index
         self.texture_size = texture_size
+
+        # For re-buffering logic (when a sprite is dirty or removed
+        self.rebuffer_needed = False
 
         self.setup_buffers()
 
@@ -67,7 +81,8 @@ class RenderBatch(Element):
             self.load_element_indices(elements, i)
         return elements
 
-    def load_element_indices(self, elements, index):
+    @staticmethod
+    def load_element_indices(elements, index):
         offset = 4 * index
 
         elements.append(offset + 3)
@@ -79,32 +94,40 @@ class RenderBatch(Element):
         elements.append(offset + 1)
 
     def destroy_if_exists(self, entity):
-        sprite = entity.get_component(SpriteRenderer)
+        target = entity.get_component(SpriteRenderer)
 
-        # for i, s in enumerate(self.sprites):
-        #     if s == sprite:
-        #         self.sprites.pop(i)
-        #         for s in self.sprites[i:]:
-        #             if s is not None:
-        #                 s.dirty = True
-        #         self.num_sprites -= 1
-        #         return True
-        #
-        # return False
-
-        #print('before')
-        #print(self.sprites)
         for i in range(self.num_sprites):
-            if self.sprites[i] == sprite:
-                print('found')
-                for j in range(i, self.num_sprites - 1):
-                    self.sprites[j] = self.sprites[j + 1]
-                    self.sprites[j].dirty = True
+            if self.sprites[i] == target:
+                #print(f'{entity.uid} removed from batch {self.batch_index}')
+                last_index = self.num_sprites - 1
+
+                # If not removing the last sprite, swap the last one into i
+                if i != last_index:
+                    self.sprites[i] = self.sprites[last_index]
+                    self.sprites[last_index] = None
+                    # Mark the moved sprite as dirty, so it updates its vertex data
+                    self.sprites[i].dirty = True
+                else:
+                    # If it's already the last sprite, just drop it
+                    self.sprites[i] = None
+
                 self.num_sprites -= 1
-                #print('after')
-                #print(self.sprites)
+                self.has_room = True
+
+                self._clear_vertex_properties(last_index)
+
+                self.rebuffer_needed = True
                 return True
-            return False
+        return False
+
+    def _clear_vertex_properties(self, index):
+        """
+        Zeros out the vertex data for the slot at index
+        so the old sprite doesn't remain in the buffer.
+        """
+        offset = index * 4 * self.VERTEX_SIZE
+        length = 4 * self.VERTEX_SIZE
+        self.vertices[offset:offset + length] = 0
 
     def add_sprite(self, sprite: SpriteRenderer):
         texture = sprite.get_texture()
@@ -124,6 +147,7 @@ class RenderBatch(Element):
             self.create_texture_array()
 
         self.load_vertex_properties(index)
+        #print(f'{sprite.entity.uid} inserted at index: {index} in batch: {self.batch_index}')
 
         if self.num_sprites >= self.MAX_BATCH_SIZE:
             self.has_room = False
@@ -133,13 +157,15 @@ class RenderBatch(Element):
         return self.has_room and (self.texture_size is None or (texture and self.texture_size == texture.size))
 
     def load_vertex_properties(self, index):
+        """
+        Load the given sprite's properties into the appropriate part of self.vertices.
+        """
         sprite: SpriteRenderer = self.sprites[index]
-
         color = sprite.color
         tex_coords = sprite.get_tex_coords()
 
-        offset = index * 4 * self.VERTEX_SIZE
 
+        # Find the texture ID
         tex_id = 0
         if sprite.get_texture() is not None:
             for i, tex in enumerate(self.textures):
@@ -147,8 +173,9 @@ class RenderBatch(Element):
                     tex_id = i + 1
                     break
 
-        is_rotated = sprite.entity.transform.rotation != 0.0
+        # Build the transform matrix if rotated
         transform_matrix = glm.mat4(1.0)
+        is_rotated = sprite.entity.transform.rotation != 0.0
         if is_rotated:
             transform_matrix = glm.translate(transform_matrix,
                                              glm.vec3(sprite.entity.transform.position.x,
@@ -161,6 +188,8 @@ class RenderBatch(Element):
                                          glm.vec3(sprite.entity.transform.scale.x,
                                                   sprite.entity.transform.scale.y,
                                                   1.0))
+
+        offset = index * 4 * self.VERTEX_SIZE
 
         # Add vertices with the appropriate properties
         x_add = 0.5
@@ -221,12 +250,24 @@ class RenderBatch(Element):
     def has_texture(self, tex):
         return tex in self.textures
 
-    def render(self, f):
-        rebuffer_data = False
+    def render(self):
+        """
+        1) Update vertex data for dirty or moved sprites.
+        2) If necessary, re-upload vertices to the GPU.
+        3) Bind the appropriate shader program & texture array.
+        4) Issue draw call if there's anything to draw.
+        """
+        # Skip if there's nothing to draw
+        if self.num_sprites == 0:
+            return
+
+        rebuffer_data = self.rebuffer_needed
+
         for i in range(self.num_sprites):
-            if self.sprites[i] is None:
-                break
-            spr: SpriteRenderer = self.sprites[i]
+            spr = self.sprites[i]
+            if spr is None:
+                continue
+
             if spr.is_dirty():
                 self.load_vertex_properties(i)
                 spr.clean()
@@ -238,6 +279,7 @@ class RenderBatch(Element):
 
         if rebuffer_data:
             self.vbo.write(self.vertices.tobytes())
+            self.rebuffer_needed = False
 
         # temporary solution until i figure out dynamic program swapping
         if self.e['Renderer'].current_shader == self.e['Assets'].get_shader('vsPickingShader.glsl', 'pickingShader.glsl'):
@@ -251,4 +293,6 @@ class RenderBatch(Element):
             'uView': self.e['Camera'].get_view_matrix(),
             'uTextures': self.texture_array
         })
-        #print(self.vertices)
+
+    def __repr__(self):
+        return f'<RenderBatch index={self.batch_index} z_index={self.z_index} num_sprites={self.num_sprites}'

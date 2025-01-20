@@ -58,5 +58,4 @@ class MouseControls(Component):
 
                 if self.e['Input'].pressed('right_click'):
                     self.holding_entity.destroy()
-                    self.e['Renderer'].destroy_entity(self.holding_entity)
                     self.holding_entity = None

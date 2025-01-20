@@ -1,5 +1,6 @@
 import moderngl, pygame, io
 import engine as engine
+from engine.components.sprite_renderer import SpriteRenderer
 from engine.ecs.entity import Entity
 from engine.observers.events import EventType
 from engine.observers.events.event import Event

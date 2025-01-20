@@ -15,7 +15,7 @@ class Renderer(ElementSingleton):
     def add(self, entity):
         spr = entity.get_component(SpriteRenderer)
 
-        if spr != None:
+        if spr is not None:
             self._add(spr)
 
     def _add(self, sprite):
@@ -41,14 +41,12 @@ class Renderer(ElementSingleton):
 
         for batch in self.batches:
             if batch.destroy_if_exists(entity):
-                return
+                pass
 
 
     def bind_shader(self, shader: tuple):
         self.current_shader = self.e['Assets'].get_shader(*shader)
 
     def render(self):
-        f = 0
         for batch in self.batches:
-            batch.render(f)
-            f += 1
+            batch.render()
