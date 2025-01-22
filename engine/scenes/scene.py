@@ -96,7 +96,7 @@ class Scene(Element):
                 entry = Entity.deserialize(entity)
                 self.add_entity_to_scene(entry)
 
-                for component in entry.components:
+                for name, component in entry.components.items():
                     if component.uid > max_comp_id:
                         max_comp_id = component.uid
 

@@ -9,7 +9,7 @@ class Renderer(ElementSingleton):
         self.current_shader = ('vsDefault.glsl', 'default.glsl')
         self.rebind_shader = False
 
-        self.max_batch_size = 5
+        self.max_batch_size = 1000
         self.batches = []
 
     def add(self, entity):
@@ -42,7 +42,6 @@ class Renderer(ElementSingleton):
         for batch in self.batches:
             if batch.destroy_if_exists(entity):
                 pass
-
 
     def bind_shader(self, shader: tuple):
         self.current_shader = self.e['Assets'].get_shader(*shader)

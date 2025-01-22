@@ -100,7 +100,6 @@ class PImGui:
             imgui.columns(1)
             imgui.pop_id()
 
-            print(out_str)
             return out_str
 
         imgui.columns(1)

@@ -1,8 +1,8 @@
 import imgui
 
-from ..utils.elements import Element
-from ..components.transform import Transform
-from ..components.component_deserializer import deserialize_component
+from engine.utils.elements import Element
+from engine.components.transform import Transform
+from engine.components.component_deserializer import deserialize_component
 
 class Entity(Element):
     ID_COUNTER = 1
@@ -10,44 +10,51 @@ class Entity(Element):
     def __init__(self, name):
         super().__init__()
         self.name = name
-        self.components = []
+        self.components = {}
         self.transform = None
         self.uid = Entity.ID_COUNTER
         Entity.ID_COUNTER += 1
         self.do_serialization = True
         self.alive = True
 
-    def get_component(self, component_class):
-        for component in self.components:
-            if isinstance(component, component_class):
-                return component
-        return None
-    
-    def remove_component(self, component_class):
-        for i, component in enumerate(self.components):
-            if isinstance(component, component_class):
-                self.components.pop(i)
-                break
+    def start(self):
+        new_components = {}
+
+        for name, component in self.components.items():
+            component.start()
+
+            if hasattr(component, 'new_components'):
+                new_components.update(component.new_components)
+
+        for _, component in new_components.items():
+
+            self.add_component(component)
+            component.start()
 
     def add_component(self, c):
         c.generate_id()
-        self.components.append(c)
+        self.components[c.__class__.__name__] = c
         c.entity = self
 
-    def start(self):
-        for component in self.components:
-            component.start()
+    def get_component(self, component_class):
+        if component_class.__name__ in self.components:
+            return self.components[component_class.__name__]
+        return None
+
+    def remove_component(self, component_class):
+        if component_class.__name__ in self.components:
+            del self.components[component_class.__name__]
 
     def destroy(self):
         self.alive = False
         for component in self.components:
-            component.destroy()
+            self.components[component].destroy()
 
     def imgui(self):
         for component in self.components:
-            show, _ = imgui.collapsing_header(component.__class__.__name__)
+            show, _ = imgui.collapsing_header(self.components[component].__class__.__name__)
             if show:
-                component.imgui()
+                self.components[component].imgui()
 
     def init(max_id):
         Entity.ID_COUNTER = max_id
@@ -57,13 +64,13 @@ class Entity(Element):
 
     def editor_update(self, dt):
         for component in self.components:
-            component.editor_update(dt)
+            self.components[component].editor_update(dt)
 
         return self.alive
 
     def update(self, dt):
         for component in self.components:
-            component.update(dt)
+            self.components[component].update(dt)
 
         return self.alive
 
@@ -74,16 +81,17 @@ class Entity(Element):
         return {
             "uid": self.uid,
             "name": self.name,
-            "components": [component.serialize() for component in self.components]
+            "components": {name: comp.serialize() for name, comp in self.components.items()}
         }
     
     @classmethod
     def deserialize(cls, data):
         entity = cls(data["name"])
 
-        for component_data in data["components"]:
+        for _, component_data in data["components"].items():
             component_type = deserialize_component(component_data)
             entity.add_component(component_type)
         entity.transform = entity.get_component(Transform)
+        print(entity.components)
 
         return entity

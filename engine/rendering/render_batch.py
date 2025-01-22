@@ -54,7 +54,7 @@ class RenderBatch(Element):
         self.texture_array = None
         self.texture_size = texture_size
 
-        # For re-buffering logic (when a sprite is dirty or removed
+        # For re-buffering logic (when a sprite is dirty or removed)
         self.rebuffer_needed = False
 
         self.setup_buffers()
@@ -98,7 +98,6 @@ class RenderBatch(Element):
 
         for i in range(self.num_sprites):
             if self.sprites[i] == target:
-                #print(f'{entity.uid} removed from batch {self.batch_index}')
                 last_index = self.num_sprites - 1
 
                 # If not removing the last sprite, swap the last one into i
@@ -147,7 +146,6 @@ class RenderBatch(Element):
             self.create_texture_array()
 
         self.load_vertex_properties(index)
-        #print(f'{sprite.entity.uid} inserted at index: {index} in batch: {self.batch_index}')
 
         if self.num_sprites >= self.MAX_BATCH_SIZE:
             self.has_room = False
