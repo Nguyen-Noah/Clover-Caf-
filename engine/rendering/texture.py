@@ -6,6 +6,10 @@ class Texture(Element):
     def __init__(self, path="Generated", width=None, height=None, colorkey=(255, 255, 255)):
         super().__init__()
         self.path = path
+        self.width = None
+        self.height = None
+        self.size = None
+
         if path != "Generated":
             self.load_texture(self.path, colorkey=colorkey)
         if width is not None and height is not None:
@@ -13,6 +17,8 @@ class Texture(Element):
             self.texture.repeat_x = True
             self.texture.repeat_y = True
             self.texture.filter = (moderngl.LINEAR, moderngl.LINEAR)
+
+        self.colorkey=colorkey
 
     def load_texture(self, path, colorkey=(255, 255, 255)):
         self.texture = load_texture(path, self.e['Game'].ctx, colorkey=colorkey)
@@ -27,13 +33,13 @@ class Texture(Element):
         return {
             "path": self.path,
             "width": self.width,
-            "height": self.height
+            "height": self.height,
+            "colorkey": self.colorkey
         }
     
     @classmethod
     def deserialize(cls, data):
-        texture = cls(data['path'])
-        return texture
+        return cls(path=data.get('path'), colorkey=data.get('colorkey', (255, 255, 255)))
 
     def __eq__(self, other):
         if not isinstance(other, Texture):

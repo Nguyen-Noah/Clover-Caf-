@@ -201,8 +201,8 @@ class Input(ElementSingleton):
         for event in pygame.event.get():
 
             try:
-                if not self.mouse.in_viewport_boundary():
-                    self.e['ImGui'].process_event(event)
+                #if not self.mouse.in_viewport_boundary():
+                self.e['ImGui'].process_event(event)
             except Exception as e:
                 pass
 

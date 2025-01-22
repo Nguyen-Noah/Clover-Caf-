@@ -1,4 +1,5 @@
 import json, os
+from engine.utils.assets import load_img
 
 def recursive_file_op(path, func, filetype=None):
     data = {}
@@ -21,6 +22,18 @@ def recursive_file_op(path, func, filetype=None):
                 data_ref[asset.split('.')[0]] = func(f[0] + '/' + asset)
 
     return data
+
+def load_dirs(path):
+    dirs = {}
+    for folder in os.listdir(path):
+        dirs[folder] = load_dir(f'{path}/{folder}')
+    return dirs
+
+def load_dir(path):
+    image_dir = {}
+    for f in os.listdir(path):
+        image_dir[f.split('.')[0]] = f'{path}/{f}'
+    return image_dir
 
 def write_f(path, data):
     f = open(path, 'w')

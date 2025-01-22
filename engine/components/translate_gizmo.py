@@ -33,10 +33,10 @@ class TranslateGizmo(Gizmo):
             if self.x_active and not self.y_active:
                 self.active_entity.transform.position.x += dx
                 if self.snap:
-                    self.active_entity.transform.position.x = round(self.e['Mouse'].get_world_x(), Settings.GRID_WIDTH)
+                    self.active_entity.transform.position.x = round(self.e['Mouse'].get_world_x(), Settings.GRID_WIDTH) + (Settings.GRID_WIDTH / 2)
             elif self.y_active and not self.x_active:
                 self.active_entity.transform.position.y += dy
                 if self.snap:
-                    self.active_entity.transform.position.y = round(self.e['Mouse'].get_world_y(), Settings.GRID_HEIGHT)
+                    self.active_entity.transform.position.y = round(self.e['Mouse'].get_world_y(), Settings.GRID_HEIGHT) + (Settings.GRID_HEIGHT / 2)
 
         super().editor_update(dt)

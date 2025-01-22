@@ -1,6 +1,6 @@
 from engine.components.component import Component
 from engine.components.scale_gizmo import ScaleGizmo
-from engine.components.spritesheet import Spritesheet
+from engine.rendering.spritesheet import Spritesheet
 from engine.components.translate_gizmo import TranslateGizmo
 
 class GizmoSystem(Component):

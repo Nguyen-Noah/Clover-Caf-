@@ -1,6 +1,4 @@
 import pygame, moderngl
-import numpy as np
-from .io import recursive_file_op
 
 def load_img(path, ctx=None, alpha=False, scale=1, colorkey=(255, 255, 255)):
     if path.split('/')[-1].split('.')[-1] in ['json']:
@@ -31,5 +29,5 @@ def pg2tex(surf, ctx):
 def load_texture(path, ctx, colorkey=(255, 255, 255)):
     return pg2tex(load_img(path, alpha=True, colorkey=colorkey), ctx)
 
-def load_img_dir(path, ctx=None, alpha=None, scale=1, colorkey=None):
-    return recursive_file_op(path, lambda x: load_img(x, ctx, alpha=alpha, scale=scale, colorkey=colorkey))
+# def load_img_dir(path, ctx=None, alpha=None, scale=1, colorkey=None):
+#     return recursive_file_op(path, lambda x: load_img(x, ctx, alpha=alpha, scale=scale, colorkey=colorkey))
