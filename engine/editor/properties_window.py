@@ -1,6 +1,7 @@
 import imgui
 
 from engine.components.non_pickable import NonPickable
+from engine.editor.game_view_window import GameViewWindow
 from engine.utils.elements import Element
 from engine.physics2d.components.rigidbody2d import RigidBody2D
 from engine.physics2d.components.box2d_collider import Box2DCollider
@@ -50,7 +51,7 @@ class PropertiesWindow(Element):
     # not the end of the world, but could be changed in the future
     def update(self, dt, current_scene):
         self.debounce -= dt
-        if self.e['Input'].pressed('left_click') and self.debounce < 0 and self.e['Mouse'].in_viewport_boundary():
+        if self.e['Input'].pressed('left_click') and self.debounce < 0 and GameViewWindow.is_focused:
             x = self.e['Mouse'].get_screen_x()
             y = self.e['Mouse'].get_screen_y()
             entity_id = current_scene.get_entity(self.picking_texture.read_pixel(x, y))

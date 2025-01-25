@@ -1,7 +1,9 @@
 import pygame, time, glm
-from ..utils.elements import ElementSingleton
-from ..primitives.vec2 import vec2
-from ..utils.io import write_json, read_json
+
+from engine.editor.game_view_window import GameViewWindow
+from engine.utils.elements import ElementSingleton
+from engine.primitives.vec2 import vec2
+from engine.utils.io import write_json, read_json
 
 class InputState:
     def __init__(self):
@@ -49,8 +51,6 @@ class Mouse(ElementSingleton):
         self.world_dx = 0
         self.world_dy = 0
 
-        self.viewport_focused = False
-
     def get_world_dx(self):
         return self.world_x - self.last_world_x
 
@@ -62,10 +62,6 @@ class Mouse(ElementSingleton):
 
     def get_scroll_y(self):
         return self.scroll_y
-
-    def in_viewport_boundary(self):
-        #return self.viewport_focused
-        return (0 <= self.get_screen_x() <= self.e['Window'].resolution[0]) and (0 <= self.get_screen_y() <= self.e['Window'].resolution[1])
 
     def get_screen_x(self):
         return self.get_screen().x
@@ -203,10 +199,10 @@ class Input(ElementSingleton):
 
         for event in pygame.event.get():
             try:
-                #if not self.mouse.in_viewport_boundary():
-                self.e['ImGui'].process_event(event)
+                if not GameViewWindow.is_focused:
+                    self.e['ImGui'].process_event(event)
             except Exception as e:
-                print(e)
+                pass
 
             if (event.type == pygame.QUIT) or (event.type == pygame.KEYDOWN and event.key == 27):
                 self.e['Game'].f = True            # uncomment if you want to profile

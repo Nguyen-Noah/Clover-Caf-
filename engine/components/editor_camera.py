@@ -1,5 +1,6 @@
 import math
 from .component import Component
+from ..editor.game_view_window import GameViewWindow
 from ..primitives import vec2
 
 class EditorCamera(Component):
@@ -29,7 +30,7 @@ class EditorCamera(Component):
         if self.drag_debounce <= 0 and not self.e['Input'].holding(self.listener):
             self.drag_debounce = 0.032
 
-        if self.e['Mouse'].get_scroll_y() != 0 and self.e['Mouse'].in_viewport_boundary():
+        if self.e['Mouse'].get_scroll_y() != 0 and GameViewWindow.is_focused:
             add_value = abs(self.e['Mouse'].get_scroll_y() * self.scroll_sensitivity) ** (
                         1 / self.editor_camera.zoom)
             add_value *= -math.copysign(1.0, self.e['Mouse'].get_scroll_y())
@@ -67,7 +68,7 @@ class EditorCamera(Component):
         if self.drag_debounce <= 0 and not self.e['Input'].holding(self.listener):
             self.drag_debounce = 0.032
 
-        if self.e['Mouse'].get_scroll_y() != 0 and self.e['Mouse'].in_viewport_boundary():
+        if self.e['Mouse'].get_scroll_y() != 0 and GameViewWindow.is_focused:
             add_value = abs(self.e['Mouse'].get_scroll_y() * self.scroll_sensitivity) ** (1 / self.editor_camera.zoom)
             add_value *= -math.copysign(1.0, self.e['Mouse'].get_scroll_y())
             self.editor_camera.zoom += add_value

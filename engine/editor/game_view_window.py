@@ -4,10 +4,15 @@ from engine.primitives import vec2
 
 class GameViewWindow:
     is_playing = False
+    is_focused = False
+    is_hovered = False
 
     @staticmethod
     def imgui(e):
         imgui.begin("Game Viewport", imgui.WINDOW_NO_SCROLLBAR | imgui.WINDOW_NO_SCROLL_WITH_MOUSE)
+
+        GameViewWindow.is_focused = imgui.is_window_focused()
+        GameViewWindow.is_hovered = imgui.is_window_hovered()
 
         window_size = GameViewWindow.get_largest_size_for_viewport(e)
         window_pos = GameViewWindow.get_centered_position_for_viewport(window_size)

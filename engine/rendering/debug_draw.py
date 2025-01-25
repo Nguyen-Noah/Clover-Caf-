@@ -1,9 +1,9 @@
 import moderngl
 import numpy as np
-from ..utils.elements import ElementSingleton
+from engine.utils.elements import ElementSingleton
 from .line2d import Line2D
-from ..primitives import vec2, vec3
-from ..utils.jmath import JMath
+from engine.primitives import vec2, vec3
+from engine.utils.jmath import JMath
 
 class DebugDraw(ElementSingleton):
     MAX_LINES = 500

@@ -1,6 +1,6 @@
 import moderngl
 import numpy as np
-from ..utils.elements import Element
+from engine.utils.elements import Element
 
 from OpenGL.GL import (
     glBindFramebuffer,

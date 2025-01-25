@@ -17,12 +17,6 @@ import pstats
 
 from scripts.scenes.editor_initializer import EditorInitializer
 
-
-# TODO: - make all paths absolute when they are loaded
-#       - current level editor's origin is top left, 
-#         eventually make a new level editor with origin at bottom right
-#           - this is why all the rendering is upside down/zoom is weird
-
 def profile_run():
     profiler = cProfile.Profile()
     profiler.enable()

@@ -3,6 +3,7 @@ from math import floor
 from .component import Component
 from .non_pickable import NonPickable
 from .sprite_renderer import SpriteRenderer
+from ..editor.game_view_window import GameViewWindow
 from ..primitives import vec2, vec4
 from ..utils.settings import Settings
 
@@ -47,7 +48,7 @@ class MouseControls(Component):
             position.y = (floor(position.y // Settings.GRID_HEIGHT) * Settings.GRID_HEIGHT) + Settings.GRID_HEIGHT / 2
 
             moved = self.moved_tile(position)
-            if self.e['Mouse'].in_viewport_boundary():
+            if GameViewWindow.is_focused or GameViewWindow.is_hovered:
                 if self.e['Input'].pressed('left_click'):
                     self.place()
                     self.debounce = self.debounce_time

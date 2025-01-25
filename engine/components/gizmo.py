@@ -2,6 +2,7 @@ from engine.components.component import Component
 from engine.components.non_pickable import NonPickable
 from engine.components.sprite_renderer import SpriteRenderer
 from engine.components.sprite import Sprite
+from engine.editor.game_view_window import GameViewWindow
 from engine.misc.prefabs import Prefabs
 from engine.primitives import vec2, vec4
 
@@ -107,7 +108,7 @@ class Gizmo(Component):
                 new_entity.transform.position += vec2(0.1, 0.1)
                 self.e['ImGui'].properties_window.active_entity = new_entity
                 return
-            elif self.e['Input'].pressed('backspace') and self.e['Mouse'].in_viewport_boundary():
+            elif self.e['Input'].pressed('backspace') and GameViewWindow.is_focused:
                 self.active_entity.destroy()
                 self._set_inactive()
                 self.e['ImGui'].properties_window.active_entity = None
