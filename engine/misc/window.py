@@ -2,16 +2,15 @@ import pygame, time, os
 from ..utils.elements import ElementSingleton
 
 class Window(ElementSingleton):
-    def __init__(self, resolution=(640, 480), caption='game', flags=0, fps_cap=60, dt_cap=1, opengl=True, shader_path=None):
+    def __init__(self, resolution=(640, 480), caption='game', flags=0, fps_cap=60, dt_cap=1, opengl=True):
         super().__init__()
         self.opengl = opengl
-        self.shader_path = shader_path
         self.resolution = resolution
         self.flags = flags
-        
+
         pygame.init()
         if self.opengl:
-            self.flags = self.flags | pygame.DOUBLEBUF | pygame.OPENGL
+            self.flags |= pygame.DOUBLEBUF | pygame.OPENGL | pygame.RESIZABLE
             pygame.display.gl_set_attribute(pygame.GL_CONTEXT_MAJOR_VERSION, 3)
             pygame.display.gl_set_attribute(pygame.GL_CONTEXT_MINOR_VERSION, 3)
             pygame.display.gl_set_attribute(pygame.GL_CONTEXT_PROFILE_MASK, pygame.GL_CONTEXT_PROFILE_CORE)
@@ -34,36 +33,30 @@ class Window(ElementSingleton):
         self.last_frame = time.time()
         self.dt = 0.1
 
+        self.resize_event = False
+
     @property
     def fps(self):
         return int(len(self.frame_log) / sum(self.frame_log))
 
     def reload_display(self, size, ignore_mgl=False):
-        try:
-            fullscreen = self.e['Settings'].fullscreen
-        except Exception:
-            fullscreen = False
-        
-        self.fullscreen_flag = pygame.FULLSCREEN if fullscreen else 0
-
-        if fullscreen and ignore_mgl:
-            size = (pygame.display.Info().current_w, pygame.display.Info().current_h)
+        self.resize_event = True
 
         if not self.native_resolution:
             self.native_resolution = (pygame.display.Info().current_w, pygame.display.Info().current_h)
-        elif not fullscreen:
+        else:
             os.environ['SDL_VIDEO_CENTERED'] = '0'
 
         if not size:
             size = self.native_resolution
-            
-        self.display = pygame.display.set_mode(size, self.flags | self.fullscreen_flag)
+
+        self.display = pygame.display.set_mode(size, self.flags)
+
         if not ignore_mgl:
-            self.e['Game'].ctx.viewport = 0, 0, size[0], size[1]
-        if fullscreen:
-            self.resolution = (pygame.display.Info().current_w, pygame.display.Info().current_h)
-        else:
-            self.resolution = tuple(size)
+            self.e['Game'].ctx.viewport = (0, 0, size[0], size[1])
+            print(self.e['Game'].ctx.viewport)
+
+        self.resolution = tuple(size)
 
     def update(self):
         self.dt = min(time.time() - self.last_frame, self.dt_cap)
@@ -74,5 +67,5 @@ class Window(ElementSingleton):
         self.display.fill((0, 0, 0))
         self.time = time.time()
         self.frames += 1
-        #print(f'fps: {self.fps}')
         pygame.display.set_caption(str(self.fps))
+        self.resize_event = False

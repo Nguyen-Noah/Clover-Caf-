@@ -54,7 +54,6 @@ def read_json(path):
 
 def write_json(path, data):
     f = open(path, 'w')
-    print(data)
     json.dump(data, f)
     f.close()
 

@@ -92,6 +92,5 @@ class Entity(Element):
             component_type = deserialize_component(component_data)
             entity.add_component(component_type)
         entity.transform = entity.get_component(Transform)
-        print(entity.components)
 
         return entity

@@ -5,12 +5,11 @@ from engine.utils.io import load_dir
 from engine.rendering.texture import Texture
 from engine.rendering.shader import Shader
 
-SHADER_PATH = 'engine/rendering/shaders'    # get this from Game.init() instead
-
 class Assets(ElementSingleton):
-    def __init__(self, spritesheet_path=None):
+    def __init__(self, spritesheet_path=None, shader_path=None):
         super().__init__()
         self.spritesheet_path = spritesheet_path
+        self.shader_path = shader_path
         self.shaders = {}
         self.spritesheets = {}
         self.textures = {}
@@ -18,7 +17,7 @@ class Assets(ElementSingleton):
     def get_shader(self, vert, frag):
         name = frag.split('.')[0]
         if name not in self.shaders:
-            self.shaders[name] = Shader(f'{SHADER_PATH}/{vert}', f'{SHADER_PATH}/{frag}')
+            self.shaders[name] = Shader(f'{self.shader_path}/{vert}', f'{self.shader_path}/{frag}')
         return self.shaders[name]
 
     def get_texture(self, resource_name, colorkey=(255, 255, 255)):

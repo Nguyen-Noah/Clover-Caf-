@@ -1,8 +1,6 @@
 import moderngl
 import numpy as np
 from ..utils.elements import Element
-from .texture import Texture
-import OpenGL.GL as gl
 
 from OpenGL.GL import (
     glBindFramebuffer,
@@ -26,7 +24,9 @@ class PickingTexture(Element):
         self.fbo = None
         self.depth_texture = None
 
-        #self.texture = Texture(width=self.width, height=self.height)
+        self.build()
+
+    def build(self):
         self.picking_texture = self.e['Game'].ctx.texture(
             (self.width, self.height), 3, dtype='f4'
         )
@@ -35,9 +35,25 @@ class PickingTexture(Element):
         self.depth_texture = self.e['Game'].ctx.depth_texture((self.width, self.height))
 
         self.fbo = self.e['Game'].ctx.framebuffer(
-            color_attachments = [self.picking_texture],
+            color_attachments=[self.picking_texture],
             depth_attachment=self.depth_texture
         )
+
+    def resize(self, new_width, new_height):
+        if (new_width == self.width) and (new_height == self.height):
+            return
+
+        self.width = new_width
+        self.height = new_height
+
+        if self.fbo:
+            self.fbo.release()
+        if self.picking_texture:
+            self.picking_texture.release()
+        if self.depth_texture:
+            self.depth_texture.release()
+
+        self.build()
 
     def enable_writing(self):
         self.fbo.use()
@@ -58,3 +74,11 @@ class PickingTexture(Element):
         glBindFramebuffer(GL_READ_FRAMEBUFFER, prev_fbo)
 
         return int(pixels[0])
+
+    def release(self):
+        if self.fbo:
+            self.fbo.release()
+        if self.picking_texture:
+            self.picking_texture.release()
+        if self.depth_texture:
+            self.depth_texture.release()

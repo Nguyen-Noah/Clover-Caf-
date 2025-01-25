@@ -1,5 +1,3 @@
-import pickle
-
 import imgui
 
 from engine.utils.elements import ElementSingleton
@@ -33,9 +31,8 @@ class SceneHierarchyWindow(ElementSingleton):
 
         imgui.pop_id()
 
-        """ if imgui.begin_drag_drop_source():
-            entity_bytes = pickle.dumps(entity.serialize())
-            imgui.set_drag_drop_payload('SceneHierarchy', entity_bytes)
+        if imgui.begin_drag_drop_source():
+            imgui.set_drag_drop_payload('SceneHierarchy', 'hi')
             imgui.text(entity.name)
 
             imgui.end_drag_drop_source()
@@ -46,6 +43,6 @@ class SceneHierarchyWindow(ElementSingleton):
             if payload_obj is not None:
                 print(payload_obj.__class__)
 
-            imgui.end_drag_drop_target() """
+            imgui.end_drag_drop_target()
 
         return tree_node_open

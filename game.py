@@ -1,6 +1,5 @@
 import moderngl, pygame, io
 import engine as engine
-from engine.components.sprite_renderer import SpriteRenderer
 from engine.ecs.entity import Entity
 from engine.observers.events import EventType
 from engine.observers.events.event import Event
@@ -62,21 +61,20 @@ class Game(engine.Game):
             input_path='data/config/key_mappings.json',
             fps_cap=Screen.FPS,
             opengl=True,
-            shader_path='scripts/rendering/shaders',
-            spritesheet_path='data/assets/spritesheets',
-            flags=pygame.RESIZABLE
+            shader_path='engine/rendering/shaders',
+            spritesheet_path='data/assets/spritesheets'
             )
         self.ctx = moderngl.create_context(require=330)
-        self.picking_texture = PickingTexture(*Screen.RESOLUTION)
+        self.picking_texture = PickingTexture(*self.e['Window'].resolution)
         self.picking_shader = ('vsPickingShader.glsl', 'pickingShader.glsl')
-        self.imgui = ImGui(Screen.RESOLUTION, self.picking_texture)
+        self.imgui = ImGui(self.e['Window'].resolution, self.picking_texture)
         
         self.debug_draw = DebugDraw()
 
         self.change_scene(EditorInitializer())
 
-        self.fbo = Framebuffer(*Screen.RESOLUTION)
-        self.ctx.viewport = (0, 0, *Screen.RESOLUTION)
+        self.fbo = Framebuffer(*self.e['Window'].resolution)
+        self.ctx.viewport = (0, 0, *self.e['Window'].resolution)
 
     def change_scene(self, scene: SceneInitializer):
         if self.current_scene is not None:
@@ -104,12 +102,16 @@ class Game(engine.Game):
 
     def update(self):
         self.e['Window'].update()
-        self.e['ImGui'].start_frame()
         self.e['Input'].update()
+        self.e['ImGui'].start_frame()
+
+        if self.e['Window'].resize_event:
+            self.fbo.resize(*self.e['Window'].resolution)
+            self.picking_texture.resize(*self.e['Window'].resolution)
 
         # Render pass 1. Render to picking texture
         self.picking_texture.enable_writing()
-        self.ctx.viewport = (0, 0, *Screen.RESOLUTION)
+        self.ctx.viewport = (0, 0, *self.e['Window'].resolution)
         self.ctx.clear(0, 0, 0, 0)
 
         self.e['Renderer'].bind_shader(self.picking_shader)

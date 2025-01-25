@@ -19,9 +19,12 @@ class PImGui:
         imgui.push_style_color(imgui.COLOR_BUTTON, 0.8, 0.1, 0.15, 1.0)
         imgui.push_style_color(imgui.COLOR_BUTTON_HOVERED, 0.9, 0.2, 0.25, 1.0)
         imgui.push_style_color(imgui.COLOR_BUTTON_ACTIVE, 0.8, 0.1, 0.15, 1.0)
+
         line_height = imgui.get_font_size() + imgui.get_style().frame_padding[1] * 2
         button_size = vec2(line_height + 3, line_height)
-        width_each = (imgui.calculate_item_width() - button_size.x * 2) / 2
+
+        available_width = imgui.get_content_region_available()[0]
+        width_each = (available_width - button_size.x * 2 - imgui.get_style().item_spacing[0] * 2) / 2
 
         # X and Y position
         imgui.push_item_width(width_each)

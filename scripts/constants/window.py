@@ -7,8 +7,8 @@ def aspect_ratio(w: int, h: int) -> Tuple[int, int]:
 
 @dataclass(frozen=True)
 class Screen:
-    WIDTH: int = 1920#1080#1350
-    HEIGHT: int = 1080#720#900
+    WIDTH: int = 1080#13501920#
+    HEIGHT: int = 720#9001080#
     RESOLUTION: tuple = (WIDTH, HEIGHT)
     ASPECT_RATIO: tuple = aspect_ratio(WIDTH, HEIGHT)
     SCALE_RATIO: int = 3

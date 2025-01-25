@@ -18,6 +18,6 @@ def init(resolution=(640, 480),
          shader_path=None,
          tilesize=(16, 16),
          dimensions=(16, 16)):
-    window = Window(resolution=resolution, caption=caption, flags=flags, fps_cap=fps_cap, dt_cap=dt_cap, opengl=opengl, shader_path=shader_path)
+    window = Window(resolution=resolution, caption=caption, flags=flags, fps_cap=fps_cap, dt_cap=dt_cap, opengl=opengl)
     input = Input(path=input_path, resolution=resolution)
-    assets = Assets(spritesheet_path=spritesheet_path)
+    assets = Assets(spritesheet_path=spritesheet_path, shader_path=shader_path)

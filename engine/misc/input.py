@@ -49,6 +49,8 @@ class Mouse(ElementSingleton):
         self.world_dx = 0
         self.world_dy = 0
 
+        self.viewport_focused = False
+
     def get_world_dx(self):
         return self.world_x - self.last_world_x
 
@@ -62,7 +64,8 @@ class Mouse(ElementSingleton):
         return self.scroll_y
 
     def in_viewport_boundary(self):
-        return (0 <= self.get_screen_x() <= self.resolution[0]) and (0 <= self.get_screen_y() <= self.resolution[1])
+        #return self.viewport_focused
+        return (0 <= self.get_screen_x() <= self.e['Window'].resolution[0]) and (0 <= self.get_screen_y() <= self.e['Window'].resolution[1])
 
     def get_screen_x(self):
         return self.get_screen().x
@@ -73,9 +76,9 @@ class Mouse(ElementSingleton):
     def get_screen(self) -> vec2:
         try:
             curr_x = self.pos.x - self.game_viewport_pos.x
-            curr_x = (curr_x / self.game_viewport_size.x) * self.resolution[0]
+            curr_x = (curr_x / self.game_viewport_size.x) * self.e['Window'].resolution[0]
             curr_y = self.pos.y - self.game_viewport_pos.y
-            curr_y = self.resolution[1] - ((curr_y / self.game_viewport_size.y) * self.resolution[1])
+            curr_y = self.e['Window'].resolution[1] - ((curr_y / self.game_viewport_size.y) * self.e['Window'].resolution[1])
 
             return vec2(curr_x, curr_y)
         except ZeroDivisionError:
@@ -199,12 +202,11 @@ class Input(ElementSingleton):
         self.mouse.update()
 
         for event in pygame.event.get():
-
             try:
                 #if not self.mouse.in_viewport_boundary():
                 self.e['ImGui'].process_event(event)
             except Exception as e:
-                pass
+                print(e)
 
             if (event.type == pygame.QUIT) or (event.type == pygame.KEYDOWN and event.key == 27):
                 self.e['Game'].f = True            # uncomment if you want to profile
@@ -288,3 +290,5 @@ class Input(ElementSingleton):
                 while self.e['Window'].time > self.repeat_times['__backspace']:
                     self.repeat_times['__backspace'] += self.repeat_rate
                     self.text_buffer.delete()
+
+        self.e['ImGui'].renderer.process_inputs()

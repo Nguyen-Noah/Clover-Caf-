@@ -20,6 +20,9 @@ class Texture(Element):
 
         self.colorkey=colorkey
 
+    def release(self):
+        self.texture.release()
+
     def load_texture(self, path, colorkey=(255, 255, 255)):
         self.texture = load_texture(path, self.e['Game'].ctx, colorkey=colorkey)
         self.width = self.texture.width
