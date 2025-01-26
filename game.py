@@ -5,6 +5,7 @@ from engine.observers.events import EventType
 from engine.observers.events.event import Event
 from engine.scenes.scene import Scene
 from engine.scenes.scene_initializer import SceneInitializer
+from engine.utils.settings import Settings
 from scripts.constants.window import Screen
 
 from engine.rendering.debug_draw import DebugDraw
@@ -119,7 +120,7 @@ class Game(engine.Game):
         self.debug_draw.begin_frame()
 
         self.fbo.use()
-        self.e['Game'].ctx.clear(0.90, 0.90, 0.90, 1.0)
+        self.e['Game'].ctx.clear(*Settings.VIEWPORT_COLOR, 1.0)
 
 
         self.debug_draw.draw()

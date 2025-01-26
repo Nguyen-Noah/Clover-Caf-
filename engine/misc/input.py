@@ -199,8 +199,14 @@ class Input(ElementSingleton):
 
         for event in pygame.event.get():
             try:
-                if not GameViewWindow.is_focused:
-                    self.e['ImGui'].process_event(event)
+                self.e['ImGui'].process_event(event)
+
+                if not GameViewWindow.is_focused or not GameViewWindow.is_hovered:
+                    self.e['ImGui'].io.want_capture_mouse = True
+                    self.e['ImGui'].io.want_capture_keyboard = True
+                else:
+                    self.e['ImGui'].io.want_capture_mouse = False
+                    self.e['ImGui'].io.want_capture_keyboard = False
             except Exception as e:
                 pass
 

@@ -1,9 +1,11 @@
+from typing import Type, Iterator, Tuple
+
 from engine.components.non_render import NonRender
-from engine.components.sprite_renderer import SpriteRenderer
+from engine.components.tag import TagComponent
 from engine.misc.camera import Camera
 from engine.components.component import Component
 from engine.ecs.entity import Entity
-from engine.components.transform import Transform
+from engine.components.transform import TransformComponent
 from engine.utils.elements import Element
 from engine.rendering.renderer import Renderer
 from engine.utils.io import write_json, read_json
@@ -17,8 +19,10 @@ class Scene(Element):
         self.physics2D = Physics2D()
         self.running = False
         self.entities = []
+        self.systems = []
 
         self._scene_initializer = scene_initializer
+
 
     def init(self):
         self.camera = Camera((3, 2))#self.e['Game'].resolution
@@ -43,8 +47,9 @@ class Scene(Element):
 
     def create_entity(self, name):
         entity = Entity(name)
-        entity.add_component(Transform())
-        entity.transform = entity.get_component(Transform)
+        entity.add_component(TransformComponent())
+        entity.transform = entity.get_component(TransformComponent)
+        entity.add_component(TagComponent(name))
         return entity
 
     def get_entity(self, uid):
@@ -53,6 +58,18 @@ class Scene(Element):
             None
         )
         return result
+
+    def get_components(self, *component_types: Type[Component]) -> Iterator[Tuple[Entity, ...]]:
+        """
+        Retrieve all entities that have all specified component types.
+        Yields tuples containing the entity and its components in the oder specified
+        :param component_types:
+        :return:
+        """
+        for entity in self.entities:
+            if entity.has_components(component_types):
+                components = tuple(entity.get_component(ct) for ct in component_types)
+                yield (entity,) + components
 
     def imgui(self):
         self._scene_initializer.imgui()
@@ -66,6 +83,9 @@ class Scene(Element):
                 self.renderer.destroy_entity(entity)
                 self.physics2D.destroy_entity(entity)
                 self.entities.pop(i)
+
+        for system in self.systems:
+            system.update(dt)
 
     def update(self, dt):
         self.camera.adjust_projection()

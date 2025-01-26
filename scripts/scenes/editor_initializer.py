@@ -10,6 +10,8 @@ from engine.components.editor_camera import EditorCamera
 from engine.components.mouse_controls import MouseControls
 from engine.scenes.scene import Scene
 from engine.scenes.scene_initializer import SceneInitializer
+from engine.systems.state_machine_system import StateMachineSystem
+
 
 class EditorInitializer(SceneInitializer):
     def __init__(self):
@@ -21,6 +23,8 @@ class EditorInitializer(SceneInitializer):
         self.editor_utils = None
 
     def init(self, scene: Scene):
+        scene.systems.append(StateMachineSystem())
+
         self.sprites = self.e['Assets'].get_spritesheet('veggies.png')
         self.tiles = self.e['Assets'].get_spritesheet('interior_free.png')      # test
         self.gizmos = self.e['Assets'].get_spritesheet('gizmos.png')

@@ -1,11 +1,8 @@
 from typing import Dict, Tuple
 
-import imgui
-
 from engine.animations.animation_state import AnimationState
 from engine.components.component import Component
 from engine.components.component_deserializer import register_component
-from engine.components.sprite_renderer import SpriteRenderer
 
 @register_component
 class StateMachine(Component):
@@ -45,54 +42,11 @@ class StateMachine(Component):
         else:
             print(f'Unable to find state {key}')
 
-    def trigger(self, trigger: str):
-        key = (self.current_state.title, trigger)
-        next_state_title = self.state_transfers.get(key)
-        if not next_state_title:
-            print(f'Unable to find trigger {trigger}')
-            return
-
-        found = self.states.get(next_state_title)
-        if found:
-            self.current_state = found
-        else:
-            print(f'Unable to find trigger {trigger}')
-
     def start(self):
         for state in self.states:
             if state.title == self.default_state_title:
                 self.current_state = state
                 break
-
-    def imgui(self):
-        for state in self.states:
-            changed, new_title = imgui.input_text('State: ', state.title, 256)
-            if changed:
-                state.title = new_title
-
-            for i, frame in enumerate(state.animation_frames):
-                changed, new_time = imgui.drag_float(
-                    f'Frame({i}) Time: ',
-                    frame.frame_time,
-                    0.01,
-                    0.0,
-                    10.0
-                )
-                if changed:
-                    frame.frame_time = new_time
-
-    def _update(self, dt):
-        if self.current_state is not None:
-            self.current_state.update(dt)
-            sprite = self.entity.get_component(SpriteRenderer)
-            if sprite is not None:
-                sprite.set_sprite(self.current_state.get_current_sprite())
-
-    def editor_update(self, dt):
-        self._update(dt)
-
-    def update(self, dt):
-        self._update(dt)
 
     def serialize(self):
         data = super().serialize()

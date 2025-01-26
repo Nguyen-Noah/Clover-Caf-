@@ -1,9 +1,7 @@
-import imgui
 from .component import Component
 from .component_deserializer import register_component
-from ..components.transform import Transform
-from ..components.sprite import Sprite
-from ..primitives.vec4 import vec4
+from engine.components.sprite import Sprite
+from engine.primitives.vec4 import vec4
 
 @register_component
 class SpriteRenderer(Component):
@@ -29,21 +27,12 @@ class SpriteRenderer(Component):
     
     def clean(self):
         self.dirty = False
-    
-    def imgui(self):
-        changed, im_vec = imgui.color_edit4('Color Picker', *self.color,
-                              imgui.COLOR_EDIT_NO_INPUTS | 
-                              imgui.COLOR_EDIT_ALPHA_BAR)
-        if changed:
-            self.set_color(vec4(*im_vec))
 
     def set_sprite(self, new_sprite):
         self.sprite = new_sprite
         self.dirty = True
 
     def set_color(self, new_color):
-        #if new_color.x == 1:
-        #    print(f'old {self.color}; new {new_color}; diff {self.color != new_color}')
         if self.color != new_color:
             self.color = new_color
             self.dirty = True

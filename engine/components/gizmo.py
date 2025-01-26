@@ -8,7 +8,6 @@ from engine.primitives import vec2, vec4
 
 
 # FIX COLOR SETTING, CURRENTLY CAUSING FPS ISSUES
-# GIZMOS DONT WORK WHEN CAMERA IS CHANGED
 class Gizmo(Component):
     def __init__(self, arrow_sprite: Sprite):
         super().__init__()
@@ -99,20 +98,21 @@ class Gizmo(Component):
         else:
             self.snap = False
 
-        self.active_entity = self.e['ImGui'].properties_window.active_entity
+        self.active_entity = self.e['SceneHierarchyWindow'].active_entity
         if self.active_entity:
             self._set_active()
-            if self.e['Input'].pressed('d'):
-                new_entity = self.active_entity.copy()
-                self.e['Game'].current_scene.add_entity_to_scene(new_entity)
-                new_entity.transform.position += vec2(0.1, 0.1)
-                self.e['ImGui'].properties_window.active_entity = new_entity
-                return
-            elif self.e['Input'].pressed('backspace') and GameViewWindow.is_focused:
-                self.active_entity.destroy()
-                self._set_inactive()
-                self.e['ImGui'].properties_window.active_entity = None
-                return
+            if GameViewWindow.is_focused:
+                if self.e['Input'].pressed('d') and self.e['Input'].holding('ctrl'):
+                    new_entity = self.active_entity.copy()
+                    self.e['Game'].current_scene.add_entity_to_scene(new_entity)
+                    new_entity.transform.position += vec2(0.1, 0.1)
+                    self.e['ImGui'].properties_window.active_entity = new_entity
+                    return
+                elif self.e['Input'].pressed('backspace'):
+                    self.active_entity.destroy()
+                    self._set_inactive()
+                    self.e['ImGui'].properties_window.active_entity = None
+                    return
         else:
             self._set_inactive()
             return

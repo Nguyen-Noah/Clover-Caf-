@@ -30,7 +30,7 @@ class EditorCamera(Component):
         if self.drag_debounce <= 0 and not self.e['Input'].holding(self.listener):
             self.drag_debounce = 0.032
 
-        if self.e['Mouse'].get_scroll_y() != 0 and GameViewWindow.is_focused:
+        if self.e['Mouse'].get_scroll_y() != 0 and (GameViewWindow.is_focused or GameViewWindow.is_hovered):
             add_value = abs(self.e['Mouse'].get_scroll_y() * self.scroll_sensitivity) ** (
                         1 / self.editor_camera.zoom)
             add_value *= -math.copysign(1.0, self.e['Mouse'].get_scroll_y())
@@ -68,7 +68,7 @@ class EditorCamera(Component):
         if self.drag_debounce <= 0 and not self.e['Input'].holding(self.listener):
             self.drag_debounce = 0.032
 
-        if self.e['Mouse'].get_scroll_y() != 0 and GameViewWindow.is_focused:
+        if self.e['Mouse'].get_scroll_y() != 0 and GameViewWindow.is_hovered:
             add_value = abs(self.e['Mouse'].get_scroll_y() * self.scroll_sensitivity) ** (1 / self.editor_camera.zoom)
             add_value *= -math.copysign(1.0, self.e['Mouse'].get_scroll_y())
             self.editor_camera.zoom += add_value

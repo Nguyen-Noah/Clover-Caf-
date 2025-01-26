@@ -1,20 +1,19 @@
+from dataclasses import dataclass
+
 from .component import Component
 from .component_deserializer import register_component
-from ..editor.pimgui import PImGui
-from ..primitives.vec2 import vec2
+from engine.primitives.vec2 import vec2
 
+@dataclass
 @register_component
-class Transform(Component):
-    def __init__(self, position=None, scale=None, rotation=0.0, z_index=0):
-        super().__init__()
-        self.position = position if position else vec2(0, 0)
-        self.scale = scale if scale else vec2(1, 1)
-        self.rotation = rotation
-        self.z_index = z_index
+class TransformComponent(Component):
+    position: vec2 = vec2()
+    scale: vec2 = vec2(1, 1)
+    rotation: float = 0
+    z_index: int = 0
 
-    def imgui(self):
-        self.entity.name = PImGui.input_text('Name: ', self.entity.name)
-        super().imgui()
+    def __post_init__(self):
+        super().__init__()
 
     def copy(self, to=None):
         if to:
@@ -23,12 +22,12 @@ class Transform(Component):
             to.rotation = self.rotation * 1
             to.z_index = self.z_index * 1
         else:
-            return Transform(self.position.copy(), self.scale.copy())
+            return TransformComponent(self.position.copy(), self.scale.copy())
 
     def equals(self, o):
         if o is None:
             return False
-        if not isinstance(o, Transform):
+        if not isinstance(o, TransformComponent):
             return False
         return self.position == o.position and self.scale == o.scale and self.rotation == o.rotation and self.z_index == o.z_index
 

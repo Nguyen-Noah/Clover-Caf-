@@ -1,5 +1,6 @@
 from engine.components.component import Component
 from engine.components.scale_gizmo import ScaleGizmo
+from engine.editor.game_view_window import GameViewWindow
 from engine.rendering.spritesheet import Spritesheet
 from engine.components.translate_gizmo import TranslateGizmo
 
@@ -24,8 +25,9 @@ class GizmoSystem(Component):
             self.entity.get_component(TranslateGizmo).set_not_using()
             self.entity.get_component(ScaleGizmo).set_using()
 
-        if self.e['Input'].pressed('e'):
-            self.using_gizmo = 0
+        if GameViewWindow.is_focused or GameViewWindow.is_hovered:
+            if self.e['Input'].pressed('e'):
+                self.using_gizmo = 0
 
-        if self.e['Input'].pressed('r'):
-            self.using_gizmo = 1
+            if self.e['Input'].pressed('r'):
+                self.using_gizmo = 1

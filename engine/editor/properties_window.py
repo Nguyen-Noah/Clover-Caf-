@@ -40,12 +40,12 @@ class PropertiesWindow(Element):
             imgui.end()
 
     def check_and_add_to_physics(self):
-            if self.active_entity is not None:
-                rb = self.active_entity.get_component(RigidBody2D)
-                collider = self.active_entity.get_component(Box2DCollider) or self.active_entity.get_component(CircleCollider)
-                if rb is not None and collider is not None:
-                    current_scene = self.e['Game'].current_scene
-                    current_scene.physics2D.add(self.active_entity)
+        if self.active_entity is not None:
+            rb = self.active_entity.get_component(RigidBody2D)
+            collider = self.active_entity.get_component(Box2DCollider) or self.active_entity.get_component(CircleCollider)
+            if rb is not None and collider is not None:
+                current_scene = self.e['Game'].current_scene
+                current_scene.physics2D.add(self.active_entity)
 
     # properties panel disappears when i try to move imgui panel, so i added a check
     # not the end of the world, but could be changed in the future

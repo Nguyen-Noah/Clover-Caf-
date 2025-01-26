@@ -1,10 +1,19 @@
-
-
 import imgui
-from engine.primitives import vec2
+from engine.primitives import vec2, vec4
+
+"""
+Basically a huge library for customizable imgui components
+"""
 
 class PImGui:
     default_column_width = 80
+
+    @staticmethod
+    def draw_color(sprite):
+        c, val = imgui.color_edit4("Color Picker", *sprite.color, imgui.COLOR_EDIT_NO_INPUTS |
+                              imgui.COLOR_EDIT_ALPHA_BAR)
+        if c:
+            sprite.set_color(vec4(*val))
 
     @staticmethod
     def draw_vec2_control(label, values, reset_value=0.0, column_width=default_column_width):

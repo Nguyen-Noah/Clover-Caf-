@@ -1,7 +1,8 @@
 import imgui
 
+from engine.components.state_machine import StateMachine
 from engine.utils.elements import Element
-from engine.components.transform import Transform
+from engine.components.transform import TransformComponent
 from engine.components.component_deserializer import deserialize_component
 
 class Entity(Element):
@@ -45,6 +46,14 @@ class Entity(Element):
         if component_class.__name__ in self.components:
             del self.components[component_class.__name__]
 
+    def has_component(self, component_type):
+        if component_type.__name__ in self.components:
+            return self.components[component_type.__name__]
+        return None
+
+    def has_components(self, component_types):
+        return all(ct.__name__ in self.components for ct in component_types)
+
     def destroy(self):
         self.alive = False
         for component in self.components:
@@ -64,6 +73,8 @@ class Entity(Element):
 
     def editor_update(self, dt):
         for component in self.components:
+            if component == 'StateMachine':
+                continue
             self.components[component].editor_update(dt)
 
         return self.alive
@@ -91,6 +102,6 @@ class Entity(Element):
         for _, component_data in data["components"].items():
             component_type = deserialize_component(component_data)
             entity.add_component(component_type)
-        entity.transform = entity.get_component(Transform)
+        entity.transform = entity.get_component(TransformComponent)
 
         return entity

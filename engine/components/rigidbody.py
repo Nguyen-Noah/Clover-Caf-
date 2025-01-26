@@ -11,6 +11,7 @@ class RigidBody(Component):
         self.friction = 0.8
         self.velocity = vec3(0, 0.5, 0)
         self.temp = vec4(0, 0, 0, 0)
+        print('sdfljh')
 
     def serialize(self):
         data = super().serialize()
