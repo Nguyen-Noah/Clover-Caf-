@@ -1,9 +1,13 @@
+from typing import Any as _Any
+
+import esper
 from engine.scenes.scene import Scene
 from engine.utils.elements import Element
 
-class System(Element):
+class System(Element, esper.Processor):
     def __init__(self):
-        super().__init__()
+        Element.__init__(self)
+        esper.Processor.__init__(self)
         """
         Base system class that all other systems inherit from.
         This class provides a standardized interface for processing entities.
@@ -17,7 +21,7 @@ class System(Element):
 
         :param dt: Delta time for frame update.
         """
-        raise NotImplementedError('Systems must implement the update method.')
+        pass
 
     def start(self):
         """

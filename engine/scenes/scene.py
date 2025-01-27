@@ -1,11 +1,13 @@
-from typing import Type, Iterator, Tuple
+from typing import Type, Iterator, Tuple, Dict
+
+import esper
 
 from engine.components.non_render import NonRender
 from engine.components.tag import TagComponent
+from engine.components.transform import TransformComponent
 from engine.misc.camera import Camera
 from engine.components.component import Component
 from engine.ecs.entity import Entity
-from engine.components.transform import TransformComponent
 from engine.utils.elements import Element
 from engine.rendering.renderer import Renderer
 from engine.utils.io import write_json, read_json
@@ -18,8 +20,7 @@ class Scene(Element):
         self.camera = None
         self.physics2D = Physics2D()
         self.running = False
-        self.entities = []
-        self.systems = []
+        self.entity_map: Dict[int, Entity] = {}
 
         self._scene_initializer = scene_initializer
 
@@ -29,47 +30,36 @@ class Scene(Element):
         self._scene_initializer.load_resources(self)
         self._scene_initializer.init(self)
 
-    def start(self):
-        for entity in self.entities:
-            entity.start()
-            if not entity.get_component(NonRender):
-                self.renderer.add(entity)
-                self.physics2D.add(entity)
-        self.running = True
-
-    def add_entity_to_scene(self, entity):
-        self.entities.append(entity)
-        if self.running:
-            entity.start()
-            if not entity.get_component(NonRender):
-                self.renderer.add(entity)
-                self.physics2D.add(entity)
-
     def create_entity(self, name):
-        entity = Entity(name)
-        entity.add_component(TransformComponent())
-        entity.transform = entity.get_component(TransformComponent)
+        uid = esper.create_entity()
+        entity = Entity(uid)
         entity.add_component(TagComponent(name))
+        entity.add_component(TransformComponent())
+        self.entity_map[uid] = entity
         return entity
 
-    def get_entity(self, uid):
-        result = next(
-            (entity for entity in self.entities if entity.uid == uid),
-            None
-        )
-        return result
+    def get_component(self, component):
+        for entity_id, component in esper.get_component(component):
+            entity = self.get_entity_by_id(entity_id)
+            if entity:
+                yield entity, component
 
-    def get_components(self, *component_types: Type[Component]) -> Iterator[Tuple[Entity, ...]]:
-        """
-        Retrieve all entities that have all specified component types.
-        Yields tuples containing the entity and its components in the oder specified
-        :param component_types:
-        :return:
-        """
-        for entity in self.entities:
-            if entity.has_components(component_types):
-                components = tuple(entity.get_component(ct) for ct in component_types)
-                yield (entity,) + components
+    def get_components(self, components):
+        for entity_id, components in esper.get_components(*components):
+            entity = self.get_entity_by_id(entity_id)
+            if entity:
+                yield (entity,) + tuple(components)
+
+    def get_entity_by_id(self, entity_id):
+        return self.entity_map.get(entity_id, None)
+
+    def get_all_entities(self):
+        return list(self.entity_map.values())
+
+    def destroy_entity(self, entity):
+        if entity.uid in self.entity_map:
+            esper.delete_entity(entity.uid)
+            del self.entity_map[entity.uid]
 
     def imgui(self):
         self._scene_initializer.imgui()
@@ -77,15 +67,8 @@ class Scene(Element):
     def editor_update(self, dt):
         self.camera.adjust_projection()
 
-        for i, entity in enumerate(self.entities):
-            alive = entity.editor_update(dt)
-            if not alive:
-                self.renderer.destroy_entity(entity)
-                self.physics2D.destroy_entity(entity)
-                self.entities.pop(i)
-
-        for system in self.systems:
-            system.update(dt)
+        self._scene_initializer.update(dt)
+        esper.process(dt)   # TODO: abstract this to a function self.process()
 
     def update(self, dt):
         self.camera.adjust_projection()
@@ -132,7 +115,6 @@ class Scene(Element):
         except Exception as e:
             print(e)
             print('Level not found, starting new level.')
-            self.entities = []
             self.loaded = True
 
     def save(self):

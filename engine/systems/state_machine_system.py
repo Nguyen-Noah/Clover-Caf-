@@ -14,7 +14,7 @@ class StateMachineSystem(System):
                 if sprite is not None:
                     sprite.set_sprite(state_machine.current_state.get_current_sprite())
 
-    def editor_update(self, dt):
+    def process(self, dt):
         self._update(dt)
 
     def update(self, dt):

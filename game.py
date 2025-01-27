@@ -78,7 +78,6 @@ class Game(engine.Game):
         self.imgui.properties_window.active_entity = None
         self.current_scene = Scene(scene)
         self.current_scene.init()
-        self.current_scene.start()
 
     def on_notify(self, entity: Entity, event: Event):
         if event.type == EventType.GAME_ENGINE_START_PLAY:

@@ -34,12 +34,9 @@ class SceneHierarchyWindow(ElementSingleton):
             imgui.end()
 
     def _draw_entity_node(self):
-        entities = self.e['Game'].current_scene.entities
+        entities = self.e['Game'].current_scene.get_all_entities()
         index = 0
         for entity in entities:
-            if not entity.do_serialization:
-                continue
-
             tree_node_open = self._do_tree_node(entity, index)
             if tree_node_open:
                 imgui.tree_pop()
@@ -48,7 +45,7 @@ class SceneHierarchyWindow(ElementSingleton):
 
     def _do_tree_node(self, entity, index):
         imgui.push_id(str(index))
-        tree_node_open = imgui.tree_node(entity.name,
+        tree_node_open = imgui.tree_node(entity.get_component(TagComponent).name,
                                          imgui.TREE_NODE_DEFAULT_OPEN | imgui.TREE_NODE_FRAME_PADDING | imgui.TREE_NODE_OPEN_ON_ARROW | imgui.TREE_NODE_SPAN_AVAILABLE_WIDTH,
                                          )
 

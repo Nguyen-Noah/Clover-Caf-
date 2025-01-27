@@ -1,14 +1,18 @@
 from engine.animations.animation_state import AnimationState
 from engine.components.sprite_renderer import SpriteRenderer
 from engine.components.state_machine import StateMachine
+from engine.components.transform import TransformComponent
+from engine.ecs.entity import Entity
 
 
 class Prefabs:
     @staticmethod
     def generate_sprite_object(e, sprite, size_x, size_y):
-        block = e['Game'].current_scene.create_entity(name='Sprite_Object_Gen')
-        block.transform.scale.x = size_x
-        block.transform.scale.y = size_y
+        block: Entity = e['Game'].current_scene.create_entity(name='Sprite_Object_Gen')
+
+        transform = block.get_component(TransformComponent)
+        transform.scale.x = size_x
+        transform.scale.y = size_y
         renderer = SpriteRenderer(sprite=sprite)
         block.add_component(renderer)
         return block

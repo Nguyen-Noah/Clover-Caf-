@@ -1,15 +1,17 @@
+import esper
 import imgui
 
 from engine.assets.assets import Assets
 from engine.components.gizmo_system import GizmoSystem
 from engine.components.non_pickable import NonPickable
+from engine.editor.editor_layer import EditorUtils
 from engine.misc.prefabs import Prefabs
-from engine.components.gridlines import GridLines
 from engine.components.editor_camera import EditorCamera
 
-from engine.components.mouse_controls import MouseControls
+from engine.editor.mouse_controls import MouseControls
 from engine.scenes.scene import Scene
 from engine.scenes.scene_initializer import SceneInitializer
+from engine.systems.editor_system import EditorSystem
 from engine.systems.state_machine_system import StateMachineSystem
 
 
@@ -20,26 +22,17 @@ class EditorInitializer(SceneInitializer):
         self.sprites = None
         self.tiles = None
         self.gizmos = None
-        self.editor_utils = None
+        self.editor_utils = EditorUtils()
 
     def init(self, scene: Scene):
-        scene.systems.append(StateMachineSystem())
+        #esper.add_processor(StateMachineSystem())   # abstract this to self.add_processor()
+        #esper.add_processor(EditorSystem())
 
         self.sprites = self.e['Assets'].get_spritesheet('veggies.png')
         self.tiles = self.e['Assets'].get_spritesheet('interior_free.png')      # test
         self.gizmos = self.e['Assets'].get_spritesheet('gizmos.png')
 
         scene.load('level.json')
-
-        self.editor_utils = scene.create_entity('LevelEditor')
-        self.editor_utils.set_no_serialize()
-        self.editor_utils.add_component(MouseControls())
-        self.editor_utils.add_component(GridLines())
-        self.editor_utils.add_component(EditorCamera(scene.camera))
-        if not self.e['Game'].runtime_playing:
-            self.editor_utils.add_component(GizmoSystem(self.gizmos))
-            self.editor_utils.add_component(NonPickable())
-        scene.add_entity_to_scene(self.editor_utils)
 
     def load_resources(self, scene: Scene):
         a: Assets = self.e['Assets']
@@ -51,14 +44,11 @@ class EditorInitializer(SceneInitializer):
 
         a.add_spritesheets('animations/player/idle', 15, 15, 12, 32, colorkey=(0, 0, 0))
 
-        #a.add_spritesheet('animations/player/idle.png', 15, 15, 12, 32, colorkey=(0, 0, 0))
-
+    # TODO: find a better place for this
+    def update(self, dt):
+        self.editor_utils.update(dt)
 
     def imgui(self):
-        imgui.begin('Level Editor Stuff')
-        self.editor_utils.imgui()
-        imgui.end()
-
         imgui.begin('Plants')
 
         with imgui.begin_tab_bar('WindowTabBar'):
@@ -81,7 +71,7 @@ class EditorInitializer(SceneInitializer):
                                           (tex_coords[2].x, tex_coords[0].y),
                                           (tex_coords[0].x, tex_coords[2].y)):
                         entity = Prefabs.generate_sprite_object(self.e, sprite, 0.25, 0.25)
-                        self.editor_utils.get_component(MouseControls).pickup_entity(entity)
+                        self.editor_utils.mouse_controls.pickup_entity(entity)
                     imgui.pop_id()
 
                     last_button_pos = imgui.get_item_rect_max()

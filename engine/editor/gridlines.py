@@ -1,8 +1,8 @@
-from .component import Component
-from ..utils.settings import Settings
-from ..primitives import vec2, vec3
+from engine.utils.elements import Element
+from engine.utils.settings import Settings
+from engine.primitives import vec2, vec3
 
-class GridLines(Component):
+class GridLines(Element):
     def __init__(self):
         super().__init__()
 
