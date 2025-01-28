@@ -1,8 +1,12 @@
 import esper
 
+from engine.components.tag import TagComponent
+
+
 class Entity:
-    def __init__(self, uid: int):
+    def __init__(self, uid: int, scene):
         self.uid = uid
+        self.scene = scene
         self.do_serialization = True
 
     def add_component(self, component):
@@ -17,6 +21,9 @@ class Entity:
     def get_component(self, component):
         return esper.component_for_entity(self.uid, component)
 
+    def try_component(self, component):
+        return esper.has_component(self.uid, component)
+
     def get_all_components(self):
         return esper.components_for_entity(self.uid)
 
@@ -27,7 +34,14 @@ class Entity:
         self.do_serialization = False
 
     def copy(self):
-        return self.deserialize(self.serialize())
+        new_entity = self.scene.create_entity()
+        for component in esper.components_for_entity(self.uid):
+            new_entity.add_component(component)
+        return new_entity
+
+    def destroy(self):
+        esper.delete_entity(self.uid)
+        self.scene.destroy_entity(self)
 
     def serialize(self):
         return self.__dict__

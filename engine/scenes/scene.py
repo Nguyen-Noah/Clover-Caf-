@@ -1,8 +1,7 @@
-from typing import Type, Iterator, Tuple, Dict
+from typing import Dict
 
 import esper
 
-from engine.components.non_render import NonRender
 from engine.components.tag import TagComponent
 from engine.components.transform import TransformComponent
 from engine.misc.camera import Camera
@@ -24,33 +23,33 @@ class Scene(Element):
 
         self._scene_initializer = scene_initializer
 
-
     def init(self):
         self.camera = Camera((3, 2))#self.e['Game'].resolution
         self._scene_initializer.load_resources(self)
         self._scene_initializer.init(self)
 
-    def create_entity(self, name):
+    def create_entity(self, name=""):
         uid = esper.create_entity()
-        entity = Entity(uid)
-        entity.add_component(TagComponent(name))
+        entity = Entity(uid, self)
+        if name != "":
+            entity.add_component(TagComponent(name))
         entity.add_component(TransformComponent())
         self.entity_map[uid] = entity
         return entity
 
     def get_component(self, component):
         for entity_id, component in esper.get_component(component):
-            entity = self.get_entity_by_id(entity_id)
+            entity = self.get_entity(entity_id)
             if entity:
                 yield entity, component
 
     def get_components(self, components):
         for entity_id, components in esper.get_components(*components):
-            entity = self.get_entity_by_id(entity_id)
+            entity = self.get_entity(entity_id)
             if entity:
                 yield (entity,) + tuple(components)
 
-    def get_entity_by_id(self, entity_id):
+    def get_entity(self, entity_id):
         return self.entity_map.get(entity_id, None)
 
     def get_all_entities(self):
@@ -70,23 +69,8 @@ class Scene(Element):
         self._scene_initializer.update(dt)
         esper.process(dt)   # TODO: abstract this to a function self.process()
 
-    def update(self, dt):
-        self.camera.adjust_projection()
-        self.physics2D.update(dt)
-
-        for i, entity in enumerate(self.entities):
-            alive = entity.update(dt)
-            if not alive:
-                self.renderer.destroy_entity(entity)
-                self.physics2D.destroy_entity(entity)
-                self.entities.pop(i)
-
     def render(self):
         self.renderer.render()
-
-    def destroy(self):
-        for entity in self.entities:
-            entity.destroy()
 
     # might want to add some safety checks here
     def load(self, path):

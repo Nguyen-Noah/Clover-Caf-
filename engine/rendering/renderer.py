@@ -1,4 +1,3 @@
-import moderngl, pygame
 from ..utils.elements import ElementSingleton
 from ..components.sprite_renderer import SpriteRenderer
 from .render_batch import RenderBatch

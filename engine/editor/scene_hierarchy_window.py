@@ -37,6 +37,9 @@ class SceneHierarchyWindow(ElementSingleton):
         entities = self.e['Game'].current_scene.get_all_entities()
         index = 0
         for entity in entities:
+            if entity.try_component(NonPickable):
+                continue
+
             tree_node_open = self._do_tree_node(entity, index)
             if tree_node_open:
                 imgui.tree_pop()

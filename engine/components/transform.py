@@ -12,9 +12,6 @@ class TransformComponent(Component):
     rotation: float = 0
     z_index: int = 0
 
-    def __post_init__(self):
-        super().__init__()
-
     def copy(self, to=None):
         if to:
             to.position = self.position.copy()
@@ -22,14 +19,19 @@ class TransformComponent(Component):
             to.rotation = self.rotation * 1
             to.z_index = self.z_index * 1
         else:
-            return TransformComponent(self.position.copy(), self.scale.copy())
+            return TransformComponent(self.position.copy(), self.scale.copy(), self.rotation, self.z_index)
 
     def equals(self, o):
         if o is None:
             return False
         if not isinstance(o, TransformComponent):
             return False
-        return self.position == o.position and self.scale == o.scale and self.rotation == o.rotation and self.z_index == o.z_index
+        return (
+            self.position == o.position and
+            self.scale == o.scale and
+            self.rotation == o.rotation and
+            self.z_index == o.z_index
+        )
 
     def serialize(self):
         data = super().serialize()

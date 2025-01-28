@@ -2,11 +2,12 @@ from typing import Any as _Any
 
 import esper
 from engine.scenes.scene import Scene
-from engine.utils.elements import Element
+from engine.utils.elements import ElementSingleton
 
-class System(Element, esper.Processor):
+
+class System(ElementSingleton, esper.Processor):
     def __init__(self):
-        Element.__init__(self)
+        ElementSingleton.__init__(self)
         esper.Processor.__init__(self)
         """
         Base system class that all other systems inherit from.
