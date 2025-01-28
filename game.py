@@ -11,7 +11,7 @@ from scripts.constants.window import Screen
 from engine.rendering.debug_draw import DebugDraw
 from engine.rendering.framebuffer import Framebuffer
 from engine.rendering.picking_texture import PickingTexture
-from engine.misc.custom_imgui import ImGui
+from engine.misc.imgui_layer import ImGuiLayer
 
 import cProfile
 import pstats
@@ -62,7 +62,7 @@ class Game(engine.Game):
         self.ctx = moderngl.create_context(require=330)
         self.picking_texture = PickingTexture(*self.e['Window'].resolution)
         self.picking_shader = ('vsPickingShader.glsl', 'pickingShader.glsl')
-        self.imgui = ImGui(self.e['Window'].resolution, self.picking_texture)
+        self.imgui = ImGuiLayer(self.e['Window'].resolution, self.picking_texture)
         
         self.debug_draw = DebugDraw()
 
@@ -97,7 +97,7 @@ class Game(engine.Game):
     def update(self):
         self.e['Window'].update()
         self.e['Input'].update()
-        self.e['ImGui'].start_frame()
+        self.e['ImGuiLayer'].start_frame()
 
         if self.e['Window'].resize_event:
             self.fbo.resize(*self.e['Window'].resolution)
@@ -132,7 +132,7 @@ class Game(engine.Game):
 
         self.fbo.unbind()
 
-        self.e['ImGui'].update(self.e['Window'].dt, self.current_scene)
+        self.e['ImGuiLayer'].update(self.e['Window'].dt, self.current_scene)
 
         self.e['Game'].ctx.disable(moderngl.BLEND)
         pygame.display.flip()

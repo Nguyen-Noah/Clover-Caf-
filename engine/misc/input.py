@@ -26,11 +26,10 @@ class InputState:
         self.just_released = True
 
 class Mouse(ElementSingleton):
-    def __init__(self, resolution):
+    def __init__(self):
         super().__init__()
         self.last_world_x = 0
         self.last_world_y = 0
-        self.resolution = resolution
         self.pos = vec2()
         self.ui_pos = vec2()
         self.movement = vec2()
@@ -130,7 +129,7 @@ class Mouse(ElementSingleton):
 imgui_ignore = [1073742049]
 
 class Input(ElementSingleton):
-    def __init__(self, path, resolution):
+    def __init__(self, path):
         super().__init__()
         self.state = 'main'
         self.text_buffer = None
@@ -159,7 +158,7 @@ class Input(ElementSingleton):
         self.shift = False
         self.ctrl = False
 
-        self.mouse = Mouse(resolution)
+        self.mouse = Mouse()
 
         self.binding_listen = None
 
@@ -199,14 +198,14 @@ class Input(ElementSingleton):
 
         for event in pygame.event.get():
             try:
-                self.e['ImGui'].process_event(event)
+                self.e['ImGuiLayer'].process_event(event)
 
                 if not GameViewWindow.is_focused or not GameViewWindow.is_hovered:
-                    self.e['ImGui'].io.want_capture_mouse = True
-                    self.e['ImGui'].io.want_capture_keyboard = True
+                    self.e['ImGuiLayer'].io.want_capture_mouse = True
+                    self.e['ImGuiLayer'].io.want_capture_keyboard = True
                 else:
-                    self.e['ImGui'].io.want_capture_mouse = False
-                    self.e['ImGui'].io.want_capture_keyboard = False
+                    self.e['ImGuiLayer'].io.want_capture_mouse = False
+                    self.e['ImGuiLayer'].io.want_capture_keyboard = False
             except Exception as e:
                 pass
 
@@ -293,4 +292,4 @@ class Input(ElementSingleton):
                     self.repeat_times['__backspace'] += self.repeat_rate
                     self.text_buffer.delete()
 
-        self.e['ImGui'].renderer.process_inputs()
+        self.e['ImGuiLayer'].renderer.process_inputs()

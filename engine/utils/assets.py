@@ -28,6 +28,3 @@ def pg2tex(surf, ctx):
 
 def load_texture(path, ctx, colorkey=(255, 255, 255)):
     return pg2tex(load_img(path, alpha=True, colorkey=colorkey), ctx)
-
-# def load_img_dir(path, ctx=None, alpha=None, scale=1, colorkey=None):
-#     return recursive_file_op(path, lambda x: load_img(x, ctx, alpha=alpha, scale=scale, colorkey=colorkey))

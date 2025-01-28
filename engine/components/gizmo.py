@@ -106,12 +106,12 @@ class Gizmo(Component):
                     new_entity = self.active_entity.copy()
                     self.e['Game'].current_scene.add_entity_to_scene(new_entity)
                     new_entity.transform.position += vec2(0.1, 0.1)
-                    self.e['ImGui'].properties_window.active_entity = new_entity
+                    self.e['ImGuiLayer'].properties_window.active_entity = new_entity
                     return
                 elif self.e['Input'].pressed('backspace'):
                     self.active_entity.destroy()
                     self._set_inactive()
-                    self.e['ImGui'].properties_window.active_entity = None
+                    self.e['ImGuiLayer'].properties_window.active_entity = None
                     return
         else:
             self._set_inactive()

@@ -11,13 +11,12 @@ def init(resolution=(640, 480),
          spritesheet_path=None,
          input_path=None,
          font_path=None,
-         flags=0,
          fps_cap=60,
          dt_cap=1,
          opengl=False,
          shader_path=None,
          tilesize=(16, 16),
          dimensions=(16, 16)):
-    window = Window(resolution=resolution, caption=caption, flags=flags, fps_cap=fps_cap, dt_cap=dt_cap, opengl=opengl)
-    input = Input(path=input_path, resolution=resolution)
+    window = Window(resolution=resolution, caption=caption, fps_cap=fps_cap, dt_cap=dt_cap, opengl=opengl)
+    input = Input(path=input_path)
     assets = Assets(spritesheet_path=spritesheet_path, shader_path=shader_path)
