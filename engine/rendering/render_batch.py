@@ -9,6 +9,14 @@ np.set_printoptions(threshold=sys.maxsize)
 
 SHADER_PATH = 'engine/rendering/shaders'
 
+
+"""
+TODO: update render() to fetch all entities with a SpriteRendererComponent.
+    -  Instead of manually adding entities, on the first iteration of render(), 
+       check if the SpriteRenderer is dirty (which will always be True by default)
+       then load the vertex properties.
+"""
+
 class RenderBatch(Element):
     """A batch responsible for drawing multiple SpriteRenderers with the same textures/size."""
 

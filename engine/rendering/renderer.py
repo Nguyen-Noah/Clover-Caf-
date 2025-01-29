@@ -2,6 +2,10 @@ from ..utils.elements import ElementSingleton
 from ..components.sprite_renderer import SpriteRenderer
 from .render_batch import RenderBatch
 
+"""
+TODO: Convert rendering system to a singleton.
+"""
+
 class Renderer(ElementSingleton):
     def __init__(self):
         super().__init__()

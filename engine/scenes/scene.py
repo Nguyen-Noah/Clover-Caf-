@@ -13,6 +13,7 @@ from engine.utils.elements import Element
 from engine.rendering.renderer import Renderer
 from engine.utils.io import write_json, read_json
 from engine.physics2d.physics2D import Physics2D
+from engine.utils.elements import ElementSingleton
 #
 # class Scene(Element):
 #     def __init__(self, scene_initializer):
@@ -110,8 +111,9 @@ from engine.physics2d.physics2D import Physics2D
 #                 data.append(entity.serialize())
 #         write_json('level.json', data)
 
-class Scene:
+class Scene(ElementSingleton):
     def __init__(self):
+        super().__init__()
         self.entity_map = {}
         self.physics_world = Physics2D()
         self.camera = Camera((1080, 720))  # TODO: FIND A WAY TO ADD THIS
@@ -119,6 +121,9 @@ class Scene:
         self.is_running = False
         self.is_paused = False
         self.step_frames = 0
+
+    def add_entity_to_render(self, entity):
+        self.e['Renderer'].add()
 
     def create_entity(self, name='Entity'):
         uid = esper.create_entity()
@@ -172,3 +177,9 @@ class Scene:
         # update camera
         # TODO: in the future add support for multiple cameras
         self.camera.update()
+
+        # render sprites
+        self.e['Renderer'].render()
+
+    def update_renderer(self):
+        self.e['Renderer'].render()
