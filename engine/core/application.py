@@ -1,6 +1,8 @@
 from pathlib import Path
 from dataclasses import dataclass
 
+import moderngl
+
 from Runestone.src.settings import Settings
 from engine.core.layer import Layer
 from engine.core.layer_stack import LayerStack
@@ -45,6 +47,7 @@ class Application(ElementSingleton):
         self.minimized = False      # needed?
 
         if self.spec.working_directory:
+            print(self.spec.working_directory)
             set_working_dir(Path(self.spec.working_directory))
 
         # initialize the window
@@ -57,6 +60,7 @@ class Application(ElementSingleton):
         self.input = Input("data/config/key_mappings.json") # maybe make this static
 
         # initialize the renderer
+        self.ctx = moderngl.create_context()
         self.renderer = Renderer()
 
         # initialize imgui

@@ -1,3 +1,10 @@
+from dataclasses import dataclass
+from multiprocessing.reduction import duplicate
+
+from engine.components.component_deserializer import register_component
+from engine.physics2d.enums import BodyType
+
+
 class Component:
     ID_COUNTER = 0      # global to component
 
@@ -22,3 +29,15 @@ class Component:
 
     def serialize(self):
         return self.__dict__
+
+@dataclass
+@register_component
+class RigidBody2DComponent(Component):
+    body_type: BodyType = BodyType.DYNAMIC
+    mass: float = 1.0
+    friction: float = 0.5
+    elasticity: float = 0.5
+    raw_body = None
+
+    def __post_init__(self):
+        super().__init__()

@@ -14,6 +14,7 @@ class ImGuiLayer(Layer):
 
     def on_attach(self):
         imgui.create_context()
+        self.renderer = PygameRenderer()
         self.io = imgui.get_io()
         self.io.config_flags |= imgui.CONFIG_DOCKING_ENABLE
 
@@ -23,8 +24,6 @@ class ImGuiLayer(Layer):
         self.renderer.refresh_font_texture()
 
         self.set_dark_theme_v2_colors()
-
-        self.renderer = PygameRenderer()
 
     def on_detach(self):
         if self.renderer:

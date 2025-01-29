@@ -3,7 +3,8 @@ from Runestone.src.editor_layer import EditorLayer
 from engine.core.application import ApplicationSpecification
 
 
-class RunestoneApp(engine.Application):
+
+class Game(engine.Application):
     def __init__(self, spec):
         """
         Constructor for Runestone.
@@ -22,7 +23,8 @@ def create_application():
     spec.name = "Runestone"
     spec.resolution = (1080, 720)
     spec.fps_cap = 240
-    return RunestoneApp(spec)
+    spec.working_directory = ""
+    return Game(spec)
 
 if __name__ == "__main__":
     create_application()
