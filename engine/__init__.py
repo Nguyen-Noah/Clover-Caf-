@@ -1,22 +1,42 @@
-from .assets.assets import Assets
-from .misc.game import Game
-from .misc.window import Window
-from .misc.input import Input
-from .rendering.shader import Shader
+# from .assets.assets import Assets
+# from .misc.game import Game
+# from .misc.window import Window
+# from .misc.input import Input
+# from .rendering.shader import Shader
+#
+# def init(resolution=(640, 480),
+#          caption='game',
+#          entity_path=None,
+#          audio_path=None,
+#          spritesheet_path=None,
+#          input_path=None,
+#          font_path=None,
+#          fps_cap=60,
+#          dt_cap=1,
+#          opengl=False,
+#          shader_path=None,
+#          tilesize=(16, 16),
+#          dimensions=(16, 16)):
+#     window = Window(resolution=resolution, caption=caption, fps_cap=fps_cap, dt_cap=dt_cap, opengl=opengl)
+#     input = Input(path=input_path)
+#     assets = Assets(spritesheet_path=spritesheet_path, shader_path=shader_path)
 
-def init(resolution=(640, 480), 
-         caption='game', 
-         entity_path=None, 
-         audio_path=None,
-         spritesheet_path=None,
-         input_path=None,
-         font_path=None,
-         fps_cap=60,
-         dt_cap=1,
-         opengl=False,
-         shader_path=None,
-         tilesize=(16, 16),
-         dimensions=(16, 16)):
-    window = Window(resolution=resolution, caption=caption, fps_cap=fps_cap, dt_cap=dt_cap, opengl=opengl)
-    input = Input(path=input_path)
-    assets = Assets(spritesheet_path=spritesheet_path, shader_path=shader_path)
+
+# For use only by Rune applications
+
+from engine.core.application import Application
+from engine.core.layer import Layer
+
+
+from engine.misc.input import Input
+
+from engine.imgui.imgui_layer import ImGuiLayer
+
+from engine.scenes.scene import Scene
+from engine.ecs.entity import Entity
+from engine.components.component import Component
+
+
+# Renderer --------------------
+from engine.rendering.renderer import Renderer
+# -----------------------------

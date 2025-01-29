@@ -6,7 +6,7 @@ from engine.observers.events.event import Event
 from engine.scenes.scene import Scene
 from engine.scenes.scene_initializer import SceneInitializer
 from engine.utils.settings import Settings
-from scripts.constants.window import Screen
+from Runestone.src.settings import Screen
 
 from engine.rendering.debug_draw import DebugDraw
 from engine.rendering.framebuffer import Framebuffer

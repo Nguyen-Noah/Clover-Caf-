@@ -2,10 +2,10 @@ from ..utils.elements import Element
 from .texture import Texture
 
 class Framebuffer(Element):
-    def __init__(self, width, height):
+    def __init__(self, resolution):
         super().__init__()
-        self.width = width
-        self.height = height
+        self.width = resolution[0]
+        self.height = resolution[1]
         self.fbo = None
         self.texture = None
 

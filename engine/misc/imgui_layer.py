@@ -9,6 +9,7 @@ from engine.editor.menu_bar import MenuBar
 
 FONT_PATH = 'data/fonts'
 
+# OLD IMPLEMENTATION
 class ImGuiLayer(ElementSingleton):
     def __init__(self, resolution, picking_texture):
         super().__init__()

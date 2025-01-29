@@ -6,7 +6,7 @@ def aspect_ratio(w: int, h: int) -> Tuple[int, int]:
     return w // math.gcd(w, h), h // math.gcd(w, h)
 
 @dataclass(frozen=True)
-class Screen:
+class Settings:
     WIDTH: int = 1080#13501920#
     HEIGHT: int = 720#9001080#
     RESOLUTION: tuple = (WIDTH, HEIGHT)
