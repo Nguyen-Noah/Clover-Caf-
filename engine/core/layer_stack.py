@@ -23,3 +23,6 @@ class LayerStack:
     def pop_overlay(self, overlay: Layer):
         if overlay in self.layers:
             self.layers.remove(overlay)
+
+    def __iter__(self):
+        return iter(self.layers)

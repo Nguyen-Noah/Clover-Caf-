@@ -4,6 +4,7 @@ from dataclasses import dataclass
 import moderngl
 
 from Runestone.src.settings import Settings
+from engine.assets.assets import Assets
 from engine.core.layer import Layer
 from engine.core.layer_stack import LayerStack
 from engine.imgui.imgui_layer import ImGuiLayer
@@ -46,6 +47,8 @@ class Application(ElementSingleton):
         self.running = True
         self.minimized = False      # needed?
 
+        self.fps = self.spec.fps_cap
+
         if self.spec.working_directory:
             print(self.spec.working_directory)
             set_working_dir(Path(self.spec.working_directory))
@@ -59,8 +62,11 @@ class Application(ElementSingleton):
         # initialize input
         self.input = Input("data/config/key_mappings.json") # maybe make this static
 
+        # initialize assets
+        self.assets = Assets(shader_path="Runestone/assets/shaders") # TODO: maybe make this static too and use the working_dir
+
         # initialize the renderer
-        self.ctx = moderngl.create_context()
+        self.ctx = moderngl.create_context(require=330)
         self.renderer = Renderer()
 
         # initialize imgui

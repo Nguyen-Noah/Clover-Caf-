@@ -210,8 +210,9 @@ class Input(ElementSingleton):
                 pass
 
             if (event.type == pygame.QUIT) or (event.type == pygame.KEYDOWN and event.key == 27):
-                self.e['Game'].f = True            # uncomment if you want to profile
+                #self.e['Game'].f = True            # uncomment if you want to profile
                 #self.e['Game'].quit()
+                self.e['Game'].running = False
 
             if event.type == pygame.VIDEORESIZE:
                 self.e['Window'].reload_display((event.w, event.h))

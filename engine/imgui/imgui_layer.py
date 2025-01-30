@@ -17,6 +17,7 @@ class ImGuiLayer(Layer):
         self.renderer = PygameRenderer()
         self.io = imgui.get_io()
         self.io.config_flags |= imgui.CONFIG_DOCKING_ENABLE
+        self.io.display_size = self.e['Game'].spec.resolution
 
         # setting default font
         font_size = 16
@@ -36,7 +37,10 @@ class ImGuiLayer(Layer):
 
     def begin(self):
         self.renderer.process_inputs()
-        imgui.new_frame()
+        try:
+            imgui.new_frame()
+        except imgui.core.ImGuiError as e:
+            pass
 
     def end(self):
         self.io.display_size = self.e['Window'].resolution

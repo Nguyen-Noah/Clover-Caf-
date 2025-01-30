@@ -12,7 +12,7 @@ class Layer(ElementSingleton):
     def on_detach(self):
         pass
 
-    def update(self):
+    def update(self, dt):
         pass
 
     def imgui_render(self):

@@ -178,8 +178,8 @@ class Scene(ElementSingleton):
         # TODO: in the future add support for multiple cameras
         self.camera.update()
 
-        # render sprites
-        self.e['Renderer'].render()
+    def update(self, dt):
+        self.update_runtime(dt)
 
-    def update_renderer(self):
+    def render(self):
         self.e['Renderer'].render()

@@ -27,4 +27,5 @@ def create_application():
     return Game(spec)
 
 if __name__ == "__main__":
-    create_application()
+    game = create_application()
+    game.run()
