@@ -122,6 +122,9 @@ class Scene(ElementSingleton):
         self.is_paused = False
         self.step_frames = 0
 
+    def get_all_entities(self):
+        return list(self.entity_map.values())
+
     def add_entity_to_render(self, entity):
         self.e['Renderer'].add()
 

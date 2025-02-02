@@ -1,4 +1,5 @@
 import imgui
+import pygame
 from imgui.integrations.pygame import PygameRenderer
 
 from engine.core.layer import Layer
@@ -31,13 +32,24 @@ class ImGuiLayer(Layer):
             self.renderer.shutdown()
             imgui.destroy_context()
 
-    # needed?
-    def on_event(self):
-        pass
+    def process_event(self, event):
+        self.renderer.process_event(event)
+
+        mods = pygame.key.get_mods()
+
+        # Synchronize modifier keys
+        self.io.key_ctrl = mods & pygame.KMOD_CTRL
+        self.io.key_shift = mods & pygame.KMOD_SHIFT
+        self.io.key_alt = mods & pygame.KMOD_ALT
+        self.io.key_super = mods & pygame.KMOD_GUI
 
     def begin(self):
-        self.renderer.process_inputs()
         try:
+            self.io.key_ctrl = False
+            self.io.key_shift = False
+            self.io.key_alt = False
+            self.io.key_super = False
+
             imgui.new_frame()
         except imgui.core.ImGuiError as e:
             pass

@@ -34,7 +34,7 @@ class SceneHierarchyWindow(ElementSingleton):
             imgui.end()
 
     def _draw_entity_node(self):
-        entities = self.e['Game'].current_scene.get_all_entities()
+        entities = self.e['EditorLayer'].active_scene.get_all_entities()
         index = 0
         for entity in entities:
             if entity.try_component(NonPickable):

@@ -63,7 +63,7 @@ class Application(ElementSingleton):
         self.input = Input("data/config/key_mappings.json") # maybe make this static
 
         # initialize assets
-        self.assets = Assets(shader_path="Runestone/assets/shaders") # TODO: maybe make this static too and use the working_dir
+        self.assets = Assets(spritesheet_path='data/assets/spritesheets', shader_path="Runestone/assets/shaders") # TODO: maybe make this static too and use the working_dir
 
         # initialize the renderer
         self.ctx = moderngl.create_context(require=330)

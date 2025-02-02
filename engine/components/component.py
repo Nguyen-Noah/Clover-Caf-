@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from multiprocessing.reduction import duplicate
 
 from engine.components.component_deserializer import register_component
 from engine.physics2d.enums import BodyType
